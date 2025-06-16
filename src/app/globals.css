@@ -8,74 +8,99 @@ body {
 
 @layer base {
   :root {
-    --background: 70 44% 88%; /* Light Yellowish-Green #e9edc9 */
-    --foreground: 70 20% 25%; /* Darker, desaturated green for text on light bg */
-    --card: 33 50% 92%; /* Light Beige/Off-white #f5ebe0 */
-    --card-foreground: 33 30% 30%; /* Darker, desaturated warm color for text on cards */
-    --popover: 33 50% 93%; /* Similar to card for popovers */
-    --popover-foreground: 33 30% 30%;
-    --primary: 205 79% 46%; /* Clear Blue */
-    --primary-foreground: 205 100% 95%; /* Very light blue/white for text on primary */
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 210 8.9% 10.2%;
-    --muted: 60 30% 90%; /* Lighter, muted version of background */
-    --muted-foreground: 60 20% 45%; /* Muted text color */
-    --accent: 180 65% 60%; /* Teal */
-    --accent-foreground: 180 100% 15%; /* Dark teal for text on accent */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 60 30% 80%; /* Softer border color */
-    --input: 60 30% 85%; /* Input background slightly different from card/bg */
-    --ring: 205 79% 56%; /* Slightly brighter blue for focus rings */
-    --chart-1: 205 70% 50%; /* Blue */
-    --chart-2: 180 60% 45%; /* Teal */
-    --chart-3: 25 80% 60%;  /* Orange */
-    --chart-4: 280 65% 65%; /* Purple */
-    --chart-5: 50 75% 55%;  /* Yellow-Orange */
-    --radius: 0.5rem;
-    --sidebar-background: 70 40% 85%; /* Slightly darker/desaturated version of main bg */
-    --sidebar-foreground: 70 20% 20%;
-    --sidebar-primary: 205 70% 40%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 180 60% 55%;
-    --sidebar-accent-foreground: 180 100% 10%;
-    --sidebar-border: 70 30% 75%;
-    --sidebar-ring: 205 79% 56%;
+    /* Inspired by "Chat Wrapped" image - Light Mode */
+    --background: 300 60% 97%; /* Very Pale Lavender/Pinkish White */
+    --foreground: 270 20% 35%; /* Dark Desaturated Purple/Gray */
+
+    --card: 0 0% 100%; /* White cards for clean look */
+    --card-foreground: 270 20% 30%; /* Slightly darker for card text */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 20% 30%;
+
+    --primary: 330 80% 72%; /* Soft Pink from "Interest Level" */
+    --primary-foreground: 330 100% 15%; /* Dark Pink/Purple for text on primary */
+
+    --secondary: 260 70% 95%; /* Light Lavender for secondary elements */
+    --secondary-foreground: 260 30% 40%; /* Darker Lavender for text on secondary */
+
+    --muted: 270 40% 95%; /* Lighter, muted version of background/accents */
+    --muted-foreground: 270 20% 55%; /* Muted text color */
+
+    --accent: 240 80% 75%; /* Soft Blue from "Messages per month" chart */
+    --accent-foreground: 240 100% 20%; /* Dark Blue for text on accent */
+
+    --destructive: 0 75% 65%;   /* Red for "Red Flags" */
+    --destructive-foreground: 0 0% 100%; /* White text on destructive */
+
+    --border: 270 30% 90%; /* Softer border color */
+    --input: 270 30% 94%;   /* Input background slightly different */
+    --ring: 330 80% 75%;    /* Pink for focus rings */
+
+    --chart-1: 330 70% 70%;  /* Pink */
+    --chart-2: 260 70% 75%;  /* Lavender */
+    --chart-3: 240 70% 78%;  /* Soft Blue */
+    --chart-4: 25 80% 70%;   /* Soft Orange/Peach (complementary) */
+    --chart-5: 180 50% 70%;  /* Soft Teal (complementary) */
+
+    --radius: 0.75rem; /* Slightly more rounded like the image */
+
+    /* Sidebar specific - can be themed similarly if sidebar is complex, otherwise defaults are fine */
+    --sidebar-background: 280 50% 96%;
+    --sidebar-foreground: 270 20% 30%;
+    --sidebar-primary: 330 75% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 75% 72%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 270 30% 88%;
+    --sidebar-ring: 330 80% 75%;
   }
 
   .dark {
-    --background: 220 18% 12%; /* Very Dark Desaturated Blue */
-    --foreground: 220 15% 80%; /* Light Gray for text */
-    --card: 220 15% 17%; /* Slightly Lighter Dark Blue/Gray */
-    --card-foreground: 220 15% 80%;
-    --popover: 220 15% 15%; /* Darker Popover */
-    --popover-foreground: 220 15% 80%;
-    --primary: 210 90% 60%; /* Brighter Blue for Dark Mode */
-    --primary-foreground: 210 100% 15%; /* Dark blue for text on primary */
-    --secondary: 220 15% 25%;
-    --secondary-foreground: 220 10% 70%;
-    --muted: 220 15% 22%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 170 70% 55%; /* Brighter Teal for Dark Mode */
-    --accent-foreground: 170 100% 15%; /* Dark teal for text on accent */
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 25%; /* Dark Border */
-    --input: 220 15% 20%; /* Dark Input */
-    --ring: 210 90% 70%; /* Lighter blue for focus rings */
-    --chart-1: 210 70% 55%;
-    --chart-2: 170 60% 50%;
-    --chart-3: 30 70% 60%;
-    --chart-4: 270 60% 65%;
-    --chart-5: 50 70% 60%;
-    --sidebar-background: 220 15% 10%;
-    --sidebar-foreground: 220 10% 75%;
-    --sidebar-primary: 210 80% 55%;
+    /* Dark Mode - Inspired by modern dark themes with pastel accents */
+    --background: 270 15% 12%; /* Very Dark Desaturated Purple */
+    --foreground: 270 25% 88%; /* Light Lavender/Gray for text */
+
+    --card: 270 15% 18%;     /* Slightly Lighter Dark Purple/Gray for cards */
+    --card-foreground: 270 25% 88%;
+
+    --popover: 270 15% 15%;
+    --popover-foreground: 270 25% 88%;
+
+    --primary: 330 70% 65%;   /* Brighter Pink for Dark Mode */
+    --primary-foreground: 330 100% 95%; /* Very light pink for text on primary */
+
+    --secondary: 260 30% 25%; /* Darker Lavender */
+    --secondary-foreground: 260 50% 75%;
+
+    --muted: 270 15% 22%;
+    --muted-foreground: 270 20% 65%;
+
+    --accent: 240 70% 70%;    /* Brighter Soft Blue for Dark Mode */
+    --accent-foreground: 240 100% 95%;
+
+    --destructive: 0 65% 60%;   /* Red, slightly adjusted for dark bg */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 15% 25%;   /* Dark Border */
+    --input: 270 15% 20%;    /* Dark Input */
+    --ring: 330 70% 70%;     /* Brighter Pink for focus rings */
+
+    --chart-1: 330 65% 65%;
+    --chart-2: 260 65% 70%;
+    --chart-3: 240 65% 72%;
+    --chart-4: 25 70% 65%;
+    --chart-5: 180 45% 65%;
+
+    /* Sidebar specific for dark mode */
+    --sidebar-background: 270 12% 10%;
+    --sidebar-foreground: 270 20% 80%;
+    --sidebar-primary: 330 65% 60%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 170 65% 50%;
-    --sidebar-accent-foreground: 170 100% 90%;
-    --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 210 90% 70%;
+    --sidebar-accent: 240 65% 68%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 270 15% 20%;
+    --sidebar-ring: 330 70% 70%;
   }
 }
 
