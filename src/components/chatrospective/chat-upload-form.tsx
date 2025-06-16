@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback, DragEvent } from 'react';
@@ -26,7 +27,7 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
 
   const handleFileChange = (selectedFile: File | null) => {
     if (selectedFile) {
-      if (selectedFile.type === 'text/plain' || selectedFile.name.endsWith('.txt')) {
+      if (selectedFile.type === 'text/plain' || selectedFile.name.endsWith('.txt') || selectedFile.type === 'application/json' || selectedFile.name.endsWith('.json')) {
         setFile(selectedFile);
         setFileName(selectedFile.name);
         const reader = new FileReader();
@@ -38,7 +39,7 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
         toast({
           variant: "destructive",
           title: "Invalid File Type",
-          description: "Please upload a .txt file.",
+          description: "Please upload a .txt or .json file.",
         });
         setFile(null);
         setFileName(null);
@@ -92,8 +93,16 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
     setIsLoading(true);
     try {
       // Step 1: Parse chat log (optional based on direct need for dashboard, but good practice)
-      // For now, we assume it is useful for context or future features
-      const parsedData: ChatLogParsingOutput = await chatLogParsing({ chatLog: fileContent });
+      // For now, we assume it is useful for context or future features.
+      // The main analysis flow will handle the raw chat log.
+      let parsedDataForCompletion: ChatLogParsingOutput = { messages: [] };
+      try {
+         parsedDataForCompletion = await chatLogParsing({ chatLog: fileContent });
+      } catch (parseError) {
+        console.warn("Chat log parsing failed, proceeding with raw content for analysis:", parseError);
+        // Not critical if main analysis can handle raw log
+      }
+
 
       // Step 2: Perform communication analysis
       const analysisData: CommunicationAnalysisOutput = await communicationAnalysis({ chatLog: fileContent });
@@ -102,7 +111,7 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
         throw new Error("Communication analysis failed to return data.");
       }
 
-      onAnalysisComplete(fileName, fileContent, analysisData, parsedData);
+      onAnalysisComplete(fileName, fileContent, analysisData, parsedDataForCompletion);
 
     } catch (error) {
       console.error("Analysis error:", error);
@@ -120,7 +129,7 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
     <Card className="w-full max-w-lg mx-auto shadow-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-semibold">Upload Your Chat Log</CardTitle>
-        <CardDescription>Drag & drop a .txt file or click to select.</CardDescription>
+        <CardDescription>Drag & drop a .txt or .json file or click to select.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div
@@ -150,7 +159,7 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
               <Input
                 id="file-upload"
                 type="file"
-                accept=".txt"
+                accept=".txt,.json"
                 onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 aria-label="Upload chat log file"

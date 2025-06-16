@@ -1,3 +1,4 @@
+
 // src/ai/flows/communication-analysis.ts
 'use server';
 /**
@@ -18,31 +19,82 @@ export type CommunicationAnalysisInput = z.infer<typeof CommunicationAnalysisInp
 
 const CommunicationAnalysisOutputSchema = z.object({
   totalMessagesSent: z.object({
-    userA: z.number().describe('Total messages sent by user A.'),
-    userB: z.number().describe('Total messages sent by user B.'),
+    userA: z.number().describe('Total messages sent by User A.'),
+    userB: z.number().describe('Total messages sent by User B.'),
   }).describe('Total messages sent by each user.'),
   averageResponseTime: z.object({
-    userA: z.number().describe('Average response time of user A in seconds.'),
-    userB: z.number().describe('Average response time of user B in seconds.'),
+    userA: z.number().describe('Average response time of User A in seconds.'),
+    userB: z.number().describe('Average response time of User B in seconds.'),
   }).describe('Average response time for each user.'),
   frequentWords: z.object({
-    userA: z.array(z.string()).describe('Most frequently used words by user A.'),
-    userB: z.array(z.string()).describe('Most frequently used words by user B.'),
+    userA: z.array(z.string()).describe('Most frequently used words by User A (top 5-7).'),
+    userB: z.array(z.string()).describe('Most frequently used words by User B (top 5-7).'),
   }).describe('Most frequently used words by each user.'),
   frequentEmojis: z.object({
-    userA: z.array(z.string()).describe('Most frequently used emojis by user A.'),
-    userB: z.array(z.string()).describe('Most frequently used emojis by user B.'),
+    userA: z.array(z.string()).describe('Most frequently used emojis by User A (top 5-7).'),
+    userB: z.array(z.string()).describe('Most frequently used emojis by User B (top 5-7).'),
   }).describe('Most frequently used emojis by each user.'),
   complimentCount: z.object({
-    userA: z.number().describe('Number of compliments given by user A.'),
-    userB: z.number().describe('Number of compliments given by user B.'),
+    userA: z.number().describe('Number of compliments given by User A.'),
+    userB: z.number().describe('Number of compliments given by User B.'),
   }).describe('Number of compliments given by each user.'),
   ghostingEvents: z.array(z.object({
-    ghostedUser: z.string().describe('The user who was ghosted (A or B).'),
-    startDate: z.string().describe('The start date of the ghosting event.'),
-    endDate: z.string().describe('The end date of the ghosting event.'),
+    ghostedUser: z.string().describe('The user who was ghosted (User A or User B).'),
+    startDate: z.string().describe('The approximate start date of the ghosting event (YYYY-MM-DD).'),
+    endDate: z.string().describe('The approximate end date of the ghosting event (YYYY-MM-DD or "Ongoing").'),
     durationDays: z.number().describe('The duration of the ghosting event in days.'),
-  })).describe('Identified ghosting events.'),
+  })).describe('Identified ghosting events (silence > 72 hours).'),
+
+  interestLevel: z.object({
+    userA: z.number().min(0).max(100).describe('Engagement percentage for User A (0-100), reflecting active participation and responsiveness.'),
+    userB: z.number().min(0).max(100).describe('Engagement percentage for User B (0-100), reflecting active participation and responsiveness.'),
+  }).describe('Calculated interest level or engagement percentage for each user.'),
+
+  mentionsOfExes: z.object({
+    userA: z.number().describe('Number of times User A mentioned ex-partners or past relationships.'),
+    userB: z.number().describe('Number of times User B mentioned ex-partners or past relationships.'),
+  }).describe('Count of mentions related to ex-partners for each user.'),
+
+  insultCount: z.object({
+    userA: z.number().describe('Number of insults, aggressive, or highly negative phrases used by User A.'),
+    userB: z.number().describe('Number of insults, aggressive, or highly negative phrases used by User B.'),
+  }).describe('Count of insults or overtly negative phrases used by each user.'),
+
+  oneSidedConversationScore: z.number().min(0).max(10)
+    .describe('Score from 0 (perfectly balanced) to 10 (very one-sided), indicating if one user significantly dominates the conversation.'),
+
+  doubleTextNoReplyCount: z.object({
+    userA: z.number().describe('Number of times User A sent multiple messages in a row without a reply from User B.'),
+    userB: z.number().describe('Number of times User B sent multiple messages in a row without a reply from User A.'),
+  }).describe('Count of instances where a user double-texted without receiving an intermediate reply.'),
+
+  overallSentiment: z.object({
+    userA: z.string().describe('Overall sentiment of messages from User A (e.g., Predominantly Positive, Mixed, Predominantly Negative, Neutral).'),
+    userB: z.string().describe('Overall sentiment of messages from User B (e.g., Predominantly Positive, Mixed, Predominantly Negative, Neutral).'),
+  }).describe('General sentiment expressed by each user throughout the chat.'),
+
+  positivityNegativityRatio: z.object({
+    userA: z.string().describe('Ratio/description of positive to negative toned messages for User A (e.g., "3:1 Positive", "1:2 Negative", "Balanced", "Mostly Neutral", "Insufficient data").'),
+    userB: z.string().describe('Ratio/description of positive to negative toned messages for User B (e.g., "3:1 Positive", "1:2 Negative", "Balanced", "Mostly Neutral", "Insufficient data").'),
+  }).describe('Ratio comparing positive versus negative messages for each user.'),
+
+  toxicityScore: z.object({
+    overall: z.number().min(0).max(10).describe('Overall toxicity score of the conversation (0 for very healthy, 10 for very toxic).'),
+    userA: z.number().min(0).max(10).describe('Toxicity score reflecting User A\'s contributions (0=low, 10=high).'),
+    userB: z.number().min(0).max(10).describe('Toxicity score reflecting User B\'s contributions (0=low, 10=high).'),
+  }).describe('Assessment of toxicity levels in the conversation.'),
+
+  longestMessage: z.object({
+    sender: z.string().describe('The sender of the longest message (either "User A" or "User B", or "N/A" if not determinable).'),
+    text: z.string().describe('The content of the longest single message (or "N/A").'),
+    length: z.number().describe('The character length of the longest message (or 0).'),
+  }).describe('Details about the single longest message in the chat.'),
+
+  mostEmotionalMessage: z.object({
+    sender: z.string().describe('The sender of the most emotionally charged message (either "User A" or "User B", or "N/A").'),
+    text: z.string().describe('The content of the most emotional message (or "N/A").'),
+    emotion: z.string().describe('The predominant emotion detected in this message (e.g., Joy, Sadness, Anger, Excitement, Frustration, Love, "N/A").'),
+  }).describe('The message identified as carrying the strongest emotional content.'),
 });
 export type CommunicationAnalysisOutput = z.infer<typeof CommunicationAnalysisOutputSchema>;
 
@@ -54,22 +106,43 @@ const prompt = ai.definePrompt({
   name: 'communicationAnalysisPrompt',
   input: {schema: CommunicationAnalysisInputSchema},
   output: {schema: CommunicationAnalysisOutputSchema},
-  prompt: `You are an AI expert in relationship dynamics, specializing in analyzing chat logs to extract key communication metrics and patterns.
+  prompt: `You are an AI expert in relationship dynamics and communication patterns, specializing in analyzing chat logs to extract key communication metrics, potential red flags, and insightful highlights.
 
-  Analyze the following chat log and extract the following information:
+Analyze the following chat log meticulously. Identify two primary participants as "User A" and "User B". If names are present, assign them consistently. If only one participant is clear, assign them as "User A" and use default/N/A values for "User B". Extract the following information:
 
-  - Total messages sent by each user (userA, userB).
-  - Average response time for each user (userA, userB) in seconds.
-  - Most frequently used words by each user (userA, userB).
-  - Most frequently used emojis by each user (userA, userB).
-  - Number of compliments given by each user (userA, userB).
-  - Identify any ghosting events, defined as a period of no communication lasting more than 3 days. For each event, record the user who was ghosted (A or B), the start date, the end date, and the duration in days.
+Existing Metrics:
+- Total messages sent by each user.
+- Average response time for each user in seconds. (Calculate this based on timestamps between messages from different users. If a user sends multiple messages before the other replies, consider the time until the first reply to that block. If timestamps are missing or unclear, provide 0 or a sensible default.)
+- Most frequently used words by each user (top 5-7 unique words, excluding common stop words like 'the', 'a', 'is').
+- Most frequently used emojis by each user (top 5-7 unique emojis).
+- Number of compliments given by each user.
+- Identify any ghosting events: a period of no communication from one user to another lasting more than 3 full days (72 hours). For each event, record the user who was ghosted, the approximate start date of silence (YYYY-MM-DD), the approximate end date (YYYY-MM-DD or "Ongoing" if it didn't resume by the end of the log), and the duration in days. If no ghosting, return an empty array.
 
-  Chat Log:
-  {{chatLog}}
+New Core Analysis & Red Flags:
+- Interest Level: For each user (User A, User B), provide an engagement percentage (0-100) reflecting their active participation, effort in replies, and initiation of topics. Consider factors like reply length, asking questions, and responsiveness. If unclear, use 50 as a default.
+- Mentions of Exes: Count how many times each user (User A, User B) mentions ex-partners, past relationships, or dates with other people.
+- Insult Count: Count the number of insults, aggressive, rude, or highly negative phrases used by each user (User A, User B).
+- One-Sided Conversation Score: Provide a score from 0 (perfectly balanced) to 10 (very one-sided). This score should reflect if one user significantly dominates the conversation in terms of message volume, length, or consistently initiates topics while the other gives minimal replies. If balanced or unclear, use a score around 2-3.
+- Double Texting & No Reply Count: For each user (User A, User B), count instances where they sent two or more consecutive messages without an intermediate reply from the other user, especially if the subsequent message seems like a follow-up due to lack of response.
+- Overall Sentiment: Determine the overall sentiment of messages from each user (User A, User B). Categorize as 'Predominantly Positive', 'Mixed', 'Predominantly Negative', or 'Neutral'. Default to 'Neutral' if unclear.
+- Positivity vs. Negativity Ratio: For each user (User A, User B), provide a simplified ratio or description comparing their positive-toned messages versus negative-toned messages (e.g., "3:1 Positive", "1:2 Negative", "Balanced", "Mostly Neutral", "Insufficient data").
+- Toxicity Score:
+    - Overall: A score from 0 (very healthy, respectful) to 10 (very toxic, hostile) for the entire conversation.
+    - User A: A toxicity score (0-10) for User A's contributions.
+    - User B: A toxicity score (0-10) for User B's contributions.
+  Consider insults, passive-aggression, excessive negativity, and manipulative language. Default to low scores if content is benign.
 
-  Ensure that the output is formatted as a JSON object that adheres to the CommunicationAnalysisOutputSchema. Do not include any conversational text.
-  `,
+Conversation Highlights:
+- Longest Message: Identify the single longest message sent. Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and its character length (or 0).
+- Most Emotional Message: Identify a message that stands out as particularly emotionally charged (positive or negative). Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and the predominant emotion detected (e.g., Joy, Sadness, Anger, Excitement, Frustration, Love, or "N/A").
+
+Chat Log:
+{{chatLog}}
+
+Ensure that the output is a single, valid JSON object that strictly adheres to the CommunicationAnalysisOutputSchema. Do not include any conversational text, explanations, or apologies outside of the JSON structure.
+If the chat log is too short or lacks enough interaction to determine some metrics (e.g., average response time, ghosting), use appropriate default values like 0 for counts, "N/A" or "Insufficient data" for strings/ratios where applicable, or a neutral/low score for scaled metrics if calculation is impossible. Be robust.
+Assign "User A" and "User B" consistently. If only one user is evident, populate User A fields and use defaults for User B.
+`,
 });
 
 const communicationAnalysisFlow = ai.defineFlow(
@@ -80,6 +153,9 @@ const communicationAnalysisFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    // Ensure output is not null and conforms to the schema.
+    // The prompt guides the LLM, but runtime validation / defaults might be needed for critical fields if LLM output is unreliable.
+    // For now, we trust the LLM based on the detailed prompt and schema.
     return output!;
   }
 );
