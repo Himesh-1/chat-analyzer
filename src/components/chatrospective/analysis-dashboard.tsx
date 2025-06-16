@@ -8,7 +8,7 @@ import { AvgResponseTimeChart } from './charts/avg-response-time-chart';
 import { Button } from '@/components/ui/button';
 import { 
   Users, Timer, Award, MessageCircle, SmilePlus, Ghost, ArrowLeftCircle,
-  Activity, UserMinus, Angry, ShieldAlert, Baseline, Sparkles, Info,TrendingUp, Ratio, ThumbsDown, FileWarning
+  Activity, UserMinus, Angry, ShieldAlert, Baseline, Sparkles, Info,TrendingUp, Ratio, ThumbsDown, FileWarning, MessageCircleWarning
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -91,8 +91,8 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         {interestLevel && (
           <MetricCard title="Interest Level" icon={TrendingUp}>
             <div className="space-y-2">
-              <p className="text-lg">User A: <Badge variant={interestLevel.userA > 60 ? "default" : "secondary"}>{interestLevel.userA?.toFixed(0) ?? 'N/A'}%</Badge></p>
-              <p className="text-lg">User B: <Badge variant={interestLevel.userB > 60 ? "default" : "secondary"}>{interestLevel.userB?.toFixed(0) ?? 'N/A'}%</Badge></p>
+              <div className="text-lg">User A: <Badge variant={interestLevel.userA > 60 ? "default" : "secondary"}>{interestLevel.userA?.toFixed(0) ?? 'N/A'}%</Badge></div>
+              <div className="text-lg">User B: <Badge variant={interestLevel.userB > 60 ? "default" : "secondary"}>{interestLevel.userB?.toFixed(0) ?? 'N/A'}%</Badge></div>
             </div>
           </MetricCard>
         )}
@@ -100,9 +100,9 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         {toxicityScore && (
           <MetricCard title="Toxicity Score (0-10)" icon={FileWarning}>
             <div className="space-y-2 text-sm">
-              <p>Overall: <Badge variant={toxicityScore.overall > 5 ? "destructive" : "secondary"}>{toxicityScore.overall?.toFixed(1) ?? 'N/A'}</Badge></p>
-              <p>User A: <Badge variant={toxicityScore.userA > 5 ? "destructive" : "secondary"}>{toxicityScore.userA?.toFixed(1) ?? 'N/A'}</Badge></p>
-              <p>User B: <Badge variant={toxicityScore.userB > 5 ? "destructive" : "secondary"}>{toxicityScore.userB?.toFixed(1) ?? 'N/A'}</Badge></p>
+              <div>Overall: <Badge variant={toxicityScore.overall > 5 ? "destructive" : "secondary"}>{toxicityScore.overall?.toFixed(1) ?? 'N/A'}</Badge></div>
+              <div>User A: <Badge variant={toxicityScore.userA > 5 ? "destructive" : "secondary"}>{toxicityScore.userA?.toFixed(1) ?? 'N/A'}</Badge></div>
+              <div>User B: <Badge variant={toxicityScore.userB > 5 ? "destructive" : "secondary"}>{toxicityScore.userB?.toFixed(1) ?? 'N/A'}</Badge></div>
             </div>
           </MetricCard>
         )}
@@ -182,7 +182,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {doubleTextNoReplyCount && (
-           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarningIconAvailable() ? <MessageCircleWarning /> : <Angry /> }>
+           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarningAvailable() ? MessageCircleWarning : Angry }>
             <div className="space-y-2 text-sm">
               <p>User A: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userA ?? 'N/A'}</span></p>
               <p>User B: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userB ?? 'N/A'}</span></p>
@@ -211,9 +211,9 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         {mostEmotionalMessage && mostEmotionalMessage.text && mostEmotionalMessage.text !== "N/A" && (
           <MetricCard title="Most Emotional Message" icon={Sparkles} className="md:col-span-2 lg:col-span-2">
             <ScrollArea className="h-40">
-              <p className="text-xs text-muted-foreground">
+              <div className="text-xs text-muted-foreground">
                 From: <span className="font-semibold text-primary">{mostEmotionalMessage.sender}</span> | Emotion: <Badge>{mostEmotionalMessage.emotion}</Badge>
-              </p>
+              </div>
               <p className="mt-1 text-sm bg-muted/30 p-2 rounded-sm whitespace-pre-wrap">{mostEmotionalMessage.text}</p>
             </ScrollArea>
           </MetricCard>
@@ -245,14 +245,15 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
 // Placeholder for a potentially missing icon, you might need to find an alternative or create an SVG
 // For now, this function is just illustrative.
+// A real lucide-react icon "MessageCircleWarning" exists and can be imported.
 function MessageCircleWarningIconAvailable() {
-  return false; // Assume it's not available by default
+  return true; 
 }
 
-const MessageCircleWarning = () => ( // Example SVG if you needed one
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-    <path d="M12 7v6"/>
-    <path d="M12 16h.01"/>
-  </svg>
-);
+// const MessageCircleWarningIcon = () => ( // Example SVG if you needed one, but lucide-react has it
+//   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//     <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+//     <path d="M12 7v6"/>
+//     <path d="M12 16h.01"/>
+//   </svg>
+// );
