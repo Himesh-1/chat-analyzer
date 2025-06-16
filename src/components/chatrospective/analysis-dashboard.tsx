@@ -12,11 +12,12 @@ import { useState } from 'react';
 import { 
   Users, Timer, Award, MessageCircle, SmilePlus, Ghost, ArrowLeftCircle,
   Activity, UserMinus, ThumbsDown, ShieldAlert, Baseline, Sparkles, Info, TrendingUp, Ratio, 
-  FileWarning, MessageCircleWarning, Quote, Repeat, ShieldQuestion, Zap, Megaphone, BotMessageSquare, type LucideIcon
+  FileWarning, MessageCircleWarning, Quote, Repeat, ShieldQuestion, Zap, Megaphone, BotMessageSquare, type LucideIcon,
+  Brain, Puzzle, Gauge, Annoyed, HeartPulse, Theater
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface AnalysisDashboardProps {
   analysisData: CommunicationAnalysisOutput;
@@ -151,7 +152,8 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
     totalMessagesSent, averageResponseTime, complimentCount, frequentWords, frequentEmojis, ghostingEvents,
     interestLevel, mentionsOfExes, insultCount, oneSidedConversationScore, doubleTextNoReplyCount,
     overallSentiment, positivityNegativityRatio, toxicityScore, longestMessage, mostEmotionalMessage,
-    quoteOfTheYear, mostUsedPhrases, ghostProbabilityScore
+    quoteOfTheYear, mostUsedPhrases, ghostProbabilityScore,
+    aiRelationshipSummary, compatibilityScore, conversationHealthScore, sarcasmDetection
   } = analysisData;
 
   const userALabel = anonymousMode ? "Participant 1" : "User A";
@@ -176,18 +178,33 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         </Button>
       </div>
 
+      {aiRelationshipSummary && (
+        <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300 lg:col-span-3 bg-card">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold flex items-center text-card-foreground">
+              <Brain className="mr-2 h-6 w-6 text-primary" /> AI Relationship Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-auto max-h-48">
+              <p className="text-sm text-card-foreground leading-relaxed whitespace-pre-wrap">{aiRelationshipSummary}</p>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      )}
+
       <RelationshipStory analysisData={analysisData} userALabel={userALabel} userBLabel={userBLabel} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <MetricCard title="Total Messages Sent" icon={Users} chartHeight="230px">
+        <MetricCard title="Total Messages Sent" icon={Users} chartHeight="230px" className="bg-card">
           {totalMessagesSent && <MessagesSentChart data={totalMessagesSent} userALabel={userALabel} userBLabel={userBLabel} />}
         </MetricCard>
 
-        <MetricCard title="Average Response Time" icon={Timer} chartHeight="230px">
+        <MetricCard title="Average Response Time" icon={Timer} chartHeight="230px" className="bg-card">
           {averageResponseTime && <AvgResponseTimeChart data={averageResponseTime} userALabel={userALabel} userBLabel={userBLabel} />}
         </MetricCard>
 
-        <MetricCard title="Compliment Counter" icon={Award}>
+        <MetricCard title="Compliment Counter" icon={Award} className="bg-card">
           <div className="space-y-2">
             <div className="text-lg font-semibold text-card-foreground">{userALabel}: <span className="text-primary">{complimentCount?.userA ?? 'N/A'}</span></div>
             <div className="text-lg font-semibold text-card-foreground">{userBLabel}: <span className="text-primary">{complimentCount?.userB ?? 'N/A'}</span></div>
@@ -195,7 +212,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         </MetricCard>
 
         {interestLevel && (
-          <MetricCard title="Interest Level" icon={TrendingUp}>
+          <MetricCard title="Interest Level" icon={TrendingUp} className="bg-card">
             <div className="space-y-2">
               <div className="text-lg text-card-foreground">{userALabel}: <Badge variant={interestLevel.userA > 60 ? "default" : "secondary"}>{interestLevel.userA?.toFixed(0) ?? 'N/A'}%</Badge></div>
               <div className="text-lg text-card-foreground">{userBLabel}: <Badge variant={interestLevel.userB > 60 ? "default" : "secondary"}>{interestLevel.userB?.toFixed(0) ?? 'N/A'}%</Badge></div>
@@ -204,17 +221,17 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
         
         {toxicityScore && (
-          <MetricCard title="Toxicity Score (0-10)" icon={ShieldAlert}>
+          <MetricCard title="Toxicity Score (0-10)" icon={ShieldAlert} className="bg-card">
             <div className="space-y-2 text-sm">
               <div className="text-card-foreground">Overall: <Badge variant={toxicityScore.overall > 5 ? "destructive" : "secondary"}>{toxicityScore.overall?.toFixed(1) ?? 'N/A'}</Badge></div>
-              <div className="text-card-foreground">{userALabel}: <Badge variant={toxicityScore.userA > 5 ? "destructive" : "secondary"}><span className="text-destructive-foreground">{toxicityScore.userA?.toFixed(1) ?? 'N/A'}</span></Badge></div>
-              <div className="text-card-foreground">{userBLabel}: <Badge variant={toxicityScore.userB > 5 ? "destructive" : "secondary"}><span className="text-destructive-foreground">{toxicityScore.userB?.toFixed(1) ?? 'N/A'}</span></Badge></div>
+              <div className="text-card-foreground">{userALabel}: <Badge variant={toxicityScore.userA > 5 ? "destructive" : "secondary"}>{toxicityScore.userA?.toFixed(1) ?? 'N/A'}</Badge></div>
+              <div className="text-card-foreground">{userBLabel}: <Badge variant={toxicityScore.userB > 5 ? "destructive" : "secondary"}>{toxicityScore.userB?.toFixed(1) ?? 'N/A'}</Badge></div>
             </div>
           </MetricCard>
         )}
 
         {overallSentiment && (
-          <MetricCard title="Overall Sentiment" icon={Activity}>
+          <MetricCard title="Overall Sentiment" icon={Activity} className="bg-card">
             <div className="space-y-2 text-sm">
               <div className="text-card-foreground">{userALabel}: <span className="font-semibold text-primary">{overallSentiment.userA ?? 'N/A'}</span></div>
               <div className="text-card-foreground">{userBLabel}: <span className="font-semibold text-primary">{overallSentiment.userB ?? 'N/A'}</span></div>
@@ -222,7 +239,35 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </MetricCard>
         )}
 
-        <MetricCard title={`Most Used Words (${userALabel})`} icon={MessageCircle}>
+        {compatibilityScore !== undefined && (
+           <MetricCard title="Compatibility Score" icon={Puzzle} className="bg-card">
+            <p className="text-3xl font-bold text-primary">{compatibilityScore.toFixed(0)}%</p>
+            <p className="text-xs text-muted-foreground">AI-estimated compatibility</p>
+          </MetricCard>
+        )}
+
+        {conversationHealthScore !== undefined && (
+           <MetricCard title="Conversation Health" icon={Gauge} className="bg-card">
+            <p className="text-3xl font-bold text-primary">{conversationHealthScore.toFixed(1)}<span className="text-lg text-muted-foreground">/10</span></p>
+            <p className="text-xs text-muted-foreground">0=unhealthy, 10=very healthy</p>
+          </MetricCard>
+        )}
+        
+        {sarcasmDetection && (
+           <MetricCard title="Sarcasm/Tone Watch" icon={Annoyed} className="bg-card">
+            <div className="space-y-1">
+                <p className="text-md font-semibold text-card-foreground">Level: <Badge variant={sarcasmDetection.level === 'High' || sarcasmDetection.level === 'Medium' ? 'destructive': 'secondary'}>{sarcasmDetection.level ?? 'N/A'}</Badge></p>
+                {sarcasmDetection.example && sarcasmDetection.example !== "N/A" && (
+                    <ScrollArea className="h-20">
+                        <p className="text-xs text-muted-foreground mt-1">Example: <span className="italic text-card-foreground">"{sarcasmDetection.example}"</span></p>
+                    </ScrollArea>
+                )}
+            </div>
+          </MetricCard>
+        )}
+
+
+        <MetricCard title={`Most Used Words (${userALabel})`} icon={MessageCircle} className="bg-card">
           <ScrollArea className="h-40">
             <ul className="space-y-1 text-sm">
               {frequentWords?.userA && frequentWords.userA.length > 0 ? frequentWords.userA.map((word, i) => (
@@ -232,7 +277,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </ScrollArea>
         </MetricCard>
 
-        <MetricCard title={`Most Used Words (${userBLabel})`} icon={MessageCircle}>
+        <MetricCard title={`Most Used Words (${userBLabel})`} icon={MessageCircle} className="bg-card">
           <ScrollArea className="h-40">
             <ul className="space-y-1 text-sm">
               {frequentWords?.userB && frequentWords.userB.length > 0 ? frequentWords.userB.map((word, i) => (
@@ -242,7 +287,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </ScrollArea>
         </MetricCard>
         
-        <MetricCard title={`Most Used Emojis (${userALabel})`} icon={SmilePlus}>
+        <MetricCard title={`Most Used Emojis (${userALabel})`} icon={SmilePlus} className="bg-card">
          <ScrollArea className="h-40">
           <div className="flex flex-wrap gap-2 text-2xl">
             {frequentEmojis?.userA && frequentEmojis.userA.length > 0 ? frequentEmojis.userA.map((emoji, i) => (
@@ -252,7 +297,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </ScrollArea>
         </MetricCard>
 
-        <MetricCard title={`Most Used Emojis (${userBLabel})`} icon={SmilePlus}>
+        <MetricCard title={`Most Used Emojis (${userBLabel})`} icon={SmilePlus} className="bg-card">
           <ScrollArea className="h-40">
           <div className="flex flex-wrap gap-2 text-2xl">
             {frequentEmojis?.userB && frequentEmojis.userB.length > 0 ? frequentEmojis.userB.map((emoji, i) => (
@@ -263,7 +308,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         </MetricCard>
         
         {mentionsOfExes && (
-          <MetricCard title="Mentions of Exes" icon={UserMinus}>
+          <MetricCard title="Mentions of Exes" icon={UserMinus} className="bg-card">
             <div className="space-y-2">
               <div className="text-card-foreground">{userALabel}: <span className="font-semibold text-destructive">{mentionsOfExes.userA ?? 'N/A'}</span></div>
               <div className="text-card-foreground">{userBLabel}: <span className="font-semibold text-destructive">{mentionsOfExes.userB ?? 'N/A'}</span></div>
@@ -272,7 +317,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {insultCount && (
-          <MetricCard title="Insult/Negative Phrases" icon={ThumbsDown}>
+          <MetricCard title="Insult/Negative Phrases" icon={ThumbsDown} className="bg-card">
             <div className="space-y-2">
               <div className="text-card-foreground">{userALabel}: <span className="font-semibold text-destructive">{insultCount.userA ?? 'N/A'}</span></div>
               <div className="text-card-foreground">{userBLabel}: <span className="font-semibold text-destructive">{insultCount.userB ?? 'N/A'}</span></div>
@@ -281,14 +326,14 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
         
         {oneSidedConversationScore !== undefined && (
-           <MetricCard title="Conversation Balance (0-10)" icon={Ratio}>
+           <MetricCard title="Conversation Balance (0-10)" icon={Ratio} className="bg-card">
             <p className="text-xl font-bold text-primary">{oneSidedConversationScore.toFixed(1)}</p>
             <p className="text-xs text-muted-foreground">0 = balanced, 10 = very one-sided</p>
           </MetricCard>
         )}
 
         {doubleTextNoReplyCount && (
-           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarning}>
+           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarning} className="bg-card">
             <div className="space-y-2 text-sm">
               <div className="text-card-foreground">{userALabel}: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userA ?? 'N/A'}</span></div>
               <div className="text-card-foreground">{userBLabel}: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userB ?? 'N/A'}</span></div>
@@ -297,7 +342,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
         
         {positivityNegativityRatio && (
-           <MetricCard title="Positivity/Negativity Ratio" icon={Activity}>
+           <MetricCard title="Positivity/Negativity Ratio" icon={Activity} className="bg-card">
             <div className="space-y-2 text-sm">
               <div className="text-card-foreground">{userALabel}: <span className="font-semibold text-primary">{positivityNegativityRatio.userA ?? 'N/A'}</span></div>
               <div className="text-card-foreground">{userBLabel}: <span className="font-semibold text-primary">{positivityNegativityRatio.userB ?? 'N/A'}</span></div>
@@ -306,7 +351,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
         
         {quoteOfTheYear && quoteOfTheYear !== "N/A" && (
-          <MetricCard title="Quote of the Year" icon={Quote} className="md:col-span-2 lg:col-span-1">
+          <MetricCard title="Quote of the Year" icon={Quote} className="md:col-span-2 lg:col-span-1 bg-card">
             <ScrollArea className="h-40">
               <p className="text-sm bg-background p-2 rounded-sm whitespace-pre-wrap italic text-foreground">"{quoteOfTheYear}"</p>
             </ScrollArea>
@@ -314,14 +359,14 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {ghostProbabilityScore !== undefined && (
-          <MetricCard title="Ghost Probability Score" icon={ShieldQuestion}>
+          <MetricCard title="Ghost Probability Score" icon={ShieldQuestion} className="bg-card">
             <p className="text-xl font-bold text-primary">{ghostProbabilityScore.toFixed(0)}%</p>
             <p className="text-xs text-muted-foreground">Likelihood of ghosting behavior</p>
           </MetricCard>
         )}
 
         {mostUsedPhrases?.userA && mostUsedPhrases.userA.length > 0 && mostUsedPhrases.userA[0] !== "N/A" && (
-            <MetricCard title={`Most Used Phrases (${userALabel})`} icon={Repeat}>
+            <MetricCard title={`Most Used Phrases (${userALabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userA.map((phrase, i) => (
@@ -333,7 +378,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {mostUsedPhrases?.userB && mostUsedPhrases.userB.length > 0 && mostUsedPhrases.userB[0] !== "N/A" && (
-            <MetricCard title={`Most Used Phrases (${userBLabel})`} icon={Repeat}>
+            <MetricCard title={`Most Used Phrases (${userBLabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userB.map((phrase, i) => (
@@ -346,7 +391,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
 
         {longestMessage && longestMessage.text && longestMessage.text !== "N/A" && (
-          <MetricCard title="Longest Message" icon={Baseline} className="md:col-span-2 lg:col-span-1">
+          <MetricCard title="Longest Message" icon={Baseline} className="md:col-span-2 lg:col-span-1 bg-card">
              <ScrollArea className="h-40">
               <p className="text-xs text-muted-foreground">From: <span className="font-semibold text-primary">{longestMessage.sender === 'User A' ? userALabel : longestMessage.sender === 'User B' ? userBLabel : longestMessage.sender}</span> ({longestMessage.length} chars)</p>
               <p className="mt-1 text-sm bg-background p-2 rounded-sm whitespace-pre-wrap text-foreground">{longestMessage.text}</p>
@@ -355,7 +400,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {mostEmotionalMessage && mostEmotionalMessage.text && mostEmotionalMessage.text !== "N/A" && (
-          <MetricCard title="Most Emotional Message" icon={Sparkles} className="md:col-span-2 lg:col-span-2">
+          <MetricCard title="Most Emotional Message" icon={Sparkles} className="md:col-span-2 lg:col-span-2 bg-card">
             <ScrollArea className="h-40">
               <div className="text-xs text-muted-foreground">
                 From: <span className="font-semibold text-primary">{mostEmotionalMessage.sender === 'User A' ? userALabel : mostEmotionalMessage.sender === 'User B' ? userBLabel : mostEmotionalMessage.sender}</span> | Emotion: <Badge>{mostEmotionalMessage.emotion}</Badge>
@@ -367,7 +412,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
 
         {ghostingEvents && ghostingEvents.length > 0 && (
-          <MetricCard title="Ghosting Events" icon={Ghost} className="lg:col-span-3">
+          <MetricCard title="Ghosting Events" icon={Ghost} className="lg:col-span-3 bg-card">
             <ScrollArea className="h-48">
               <ul className="space-y-3">
                 {ghostingEvents.map((event, i) => (

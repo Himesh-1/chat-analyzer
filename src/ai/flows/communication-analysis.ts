@@ -104,6 +104,18 @@ const CommunicationAnalysisOutputSchema = z.object({
   }).optional().describe('Most frequently used short phrases by each user.'),
   
   ghostProbabilityScore: z.number().min(0).max(100).optional().describe('An estimated probability (0-100) of ghosting occurring (or having occurred if the log is historical and shows such an event), based on communication patterns, response delays, and sentiment. Use 50 if neutral or difficult to determine.'),
+
+  aiRelationshipSummary: z.string().describe('An AI-generated, human-like summary (can be poetic, humorous, or brutally honest) explaining the relationship dynamics, key patterns, and overall vibe. Should be 3-5 sentences.').optional(),
+  
+  compatibilityScore: z.number().min(0).max(100).describe('An AI-estimated compatibility score (0-100%) based on message balance, emotional reciprocation, shared interests evident in chat, tone, and ghosting history. 0 is very incompatible, 100 is highly compatible. Use 50 if neutral or difficult to determine.').optional(),
+  
+  conversationHealthScore: z.number().min(0).max(10).describe('A score from 0 (very unhealthy) to 10 (very healthy) assessing overall conversation health. Consider response time fairness, tone balance (positivity/negativity), toxicity levels, and respectful engagement. 0 is very unhealthy, 10 is exceptionally healthy.').optional(),
+  
+  sarcasmDetection: z.object({
+    level: z.string().describe('Qualitative assessment of sarcasm or passive-aggressive tones (e.g., Low, Medium, High, Not Detected).'),
+    example: z.string().optional().describe('A brief example of a sarcastic or passive-aggressive message if detected, otherwise "N/A".'),
+  }).describe('Detection of sarcasm or passive-aggressive tones in the conversation.').optional(),
+
 });
 export type CommunicationAnalysisOutput = z.infer<typeof CommunicationAnalysisOutputSchema>;
 
@@ -147,6 +159,19 @@ Conversation Highlights:
 - Quote of the Year: Select one short, impactful, memorable, funny, or very representative quote from the entire conversation. If none stands out, use "N/A".
 - Most Used Phrases: For each user (User A, User B), identify their top 3-5 most frequently used short phrases (2-5 words long). Exclude extremely common pleasantries like "how are you" or "good morning" unless they are used with unusual frequency or in a unique way. If not determinable, return an empty array or ["N/A"].
 - Ghost Probability Score: Based on the entire chat log, particularly response patterns, unanswered messages, and overall engagement, estimate a "ghost probability score" from 0 to 100. A score of 0 means very unlikely to ghost/be ghosted, 50 means neutral or hard to tell, and 100 means a very high probability or clear evidence of ghosting within the log.
+
+NEWLY ADDED FEATURES:
+- AI Relationship Summary (aiRelationshipSummary): Generate a 3-5 sentence, human-like summary of the relationship dynamics observed in the chat. This summary can adopt a poetic, humorous, or brutally honest tone, as you see fit to best capture the essence of the interaction. Focus on key patterns, overall vibe, and what the chat reveals about their connection.
+- Compatibility Score (compatibilityScore): Estimate a compatibility score between User A and User B, from 0 (very incompatible) to 100 (highly compatible). Base this on factors like message balance (volume and length), emotional reciprocation (do they match each other's emotional tone?), shared interests evident in the chat, overall tone (positive/negative, supportive/critical), and ghosting history. If it's hard to determine or very neutral, assign a score around 50.
+- Conversation Health Score (conversationHealthScore): Provide a score from 0 (very unhealthy) to 10 (exceptionally healthy) that assesses the overall health of the conversation. Consider factors like:
+    - Fairness in response times (is one person consistently waiting much longer?).
+    - Tone balance (is it generally positive, or does negativity/toxicity dominate?).
+    - Levels of toxicity or aggression.
+    - Respectful engagement (do they acknowledge each other, seem to listen?).
+    A score of 5 can be neutral/average.
+- Sarcasm Detection (sarcasmDetection):
+    - level: Provide a qualitative assessment of the level of sarcasm or passive-aggressive tones in the conversation (e.g., "Not Detected", "Low", "Medium", "High").
+    - example: If sarcasm/passive-aggression is detected (Medium or High), provide one brief, representative example quote from the chat. If Low or Not Detected, this can be "N/A".
 
 Chat Log:
 {{chatLog}}
