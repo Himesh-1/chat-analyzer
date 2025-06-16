@@ -182,7 +182,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         )}
 
         {doubleTextNoReplyCount && (
-           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarningAvailable() ? MessageCircleWarning : Angry }>
+           <MetricCard title="Double Texts (No Reply)" icon={MessageCircleWarning}>
             <div className="space-y-2 text-sm">
               <p>User A: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userA ?? 'N/A'}</span></p>
               <p>User B: <span className="font-semibold text-primary">{doubleTextNoReplyCount.userB ?? 'N/A'}</span></p>
@@ -243,17 +243,5 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
   );
 }
 
-// Placeholder for a potentially missing icon, you might need to find an alternative or create an SVG
-// For now, this function is just illustrative.
-// A real lucide-react icon "MessageCircleWarning" exists and can be imported.
-function MessageCircleWarningIconAvailable() {
-  return true; 
-}
 
-// const MessageCircleWarningIcon = () => ( // Example SVG if you needed one, but lucide-react has it
-//   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-//     <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-//     <path d="M12 7v6"/>
-//     <path d="M12 16h.01"/>
-//   </svg>
-// );
+    
