@@ -1,22 +1,24 @@
+
 "use client";
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
-import { useTheme } from 'next-themes'; // Assuming next-themes is or can be used for theme colors
+import { useTheme } from 'next-themes'; 
 
 interface MessagesSentChartProps {
   data: CommunicationAnalysisOutput['totalMessagesSent'];
+  userALabel: string;
+  userBLabel: string;
 }
 
-export function MessagesSentChart({ data }: MessagesSentChartProps) {
+export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSentChartProps) {
   const { resolvedTheme } = useTheme();
-  // Fallback to a default theme if resolvedTheme is undefined
   const currentTheme = resolvedTheme || 'dark';
 
 
   const chartData = [
-    { name: 'User A', messages: data.userA, fill: "hsl(var(--chart-1))" },
-    { name: 'User B', messages: data.userB, fill: "hsl(var(--chart-2))" },
+    { name: userALabel, messages: data.userA, fill: "hsl(var(--chart-1))" },
+    { name: userBLabel, messages: data.userB, fill: "hsl(var(--chart-2))" },
   ];
   
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';

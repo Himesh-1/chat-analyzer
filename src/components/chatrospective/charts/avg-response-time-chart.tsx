@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -6,15 +7,17 @@ import { useTheme } from 'next-themes';
 
 interface AvgResponseTimeChartProps {
   data: CommunicationAnalysisOutput['averageResponseTime'];
+  userALabel: string;
+  userBLabel: string;
 }
 
-export function AvgResponseTimeChart({ data }: AvgResponseTimeChartProps) {
+export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgResponseTimeChartProps) {
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme || 'dark';
 
   const chartData = [
-    { name: 'User A', time: data.userA, fill: "hsl(var(--chart-3))" },
-    { name: 'User B', time: data.userB, fill: "hsl(var(--chart-4))" },
+    { name: userALabel, time: data.userA, fill: "hsl(var(--chart-3))" },
+    { name: userBLabel, time: data.userB, fill: "hsl(var(--chart-4))" },
   ];
 
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';

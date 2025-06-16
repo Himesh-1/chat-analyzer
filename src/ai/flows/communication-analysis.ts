@@ -95,6 +95,15 @@ const CommunicationAnalysisOutputSchema = z.object({
     text: z.string().describe('The content of the most emotional message (or "N/A").'),
     emotion: z.string().describe('The predominant emotion detected in this message (e.g., Joy, Sadness, Anger, Excitement, Frustration, Love, "N/A").'),
   }).describe('The message identified as carrying the strongest emotional content.'),
+
+  quoteOfTheYear: z.string().optional().describe('A significant, memorable, or representative quote from the conversation. Could be funny, insightful, or impactful. "N/A" if not determinable.'),
+
+  mostUsedPhrases: z.object({
+    userA: z.array(z.string()).describe('Top 3-5 most frequently used short phrases (2-5 words) by User A, excluding very common greetings or pleasantries unless they are uniquely repetitive. "N/A" if not determinable.'),
+    userB: z.array(z.string()).describe('Top 3-5 most frequently used short phrases (2-5 words) by User B, excluding very common greetings or pleasantries unless they are uniquely repetitive. "N/A" if not determinable.'),
+  }).optional().describe('Most frequently used short phrases by each user.'),
+  
+  ghostProbabilityScore: z.number().min(0).max(100).optional().describe('An estimated probability (0-100) of ghosting occurring (or having occurred if the log is historical and shows such an event), based on communication patterns, response delays, and sentiment. Use 50 if neutral or difficult to determine.'),
 });
 export type CommunicationAnalysisOutput = z.infer<typeof CommunicationAnalysisOutputSchema>;
 
@@ -135,6 +144,9 @@ New Core Analysis & Red Flags:
 Conversation Highlights:
 - Longest Message: Identify the single longest message sent. Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and its character length (or 0).
 - Most Emotional Message: Identify a message that stands out as particularly emotionally charged (positive or negative). Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and the predominant emotion detected (e.g., Joy, Sadness, Anger, Excitement, Frustration, Love, or "N/A").
+- Quote of the Year: Select one short, impactful, memorable, funny, or very representative quote from the entire conversation. If none stands out, use "N/A".
+- Most Used Phrases: For each user (User A, User B), identify their top 3-5 most frequently used short phrases (2-5 words long). Exclude extremely common pleasantries like "how are you" or "good morning" unless they are used with unusual frequency or in a unique way. If not determinable, return an empty array or ["N/A"].
+- Ghost Probability Score: Based on the entire chat log, particularly response patterns, unanswered messages, and overall engagement, estimate a "ghost probability score" from 0 to 100. A score of 0 means very unlikely to ghost/be ghosted, 50 means neutral or hard to tell, and 100 means a very high probability or clear evidence of ghosting within the log.
 
 Chat Log:
 {{chatLog}}
