@@ -16,7 +16,7 @@ const CustomizedLabel = (props: any) => {
     const { x, y, width, value, index, activeIndex } = props;
     const isActive = index === activeIndex;
 
-    if (!value || !isActive) return null;
+    if (!value) return null;
 
     return (
         <text
@@ -28,8 +28,8 @@ const CustomizedLabel = (props: any) => {
             textAnchor="middle"
             style={{
                 opacity: isActive ? 1 : 0,
-                transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
+                transform: `translateY(${isActive ? '0px' : '5px'})`,
+                transition: 'opacity 0.25s ease-in-out, transform 0.25s ease-in-out',
                 pointerEvents: 'none'
             }}
         >
@@ -72,7 +72,7 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
                 <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={1}/>
             </linearGradient>
             <linearGradient id="gradientUserAHover" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(330, 70%, 60%)" stopOpacity={1}/>
+                <stop offset="5%" stopColor="hsl(330, 70%, 55%)" stopOpacity={1}/>
                 <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={1}/>
             </linearGradient>
             
@@ -81,7 +81,7 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
                 <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={1}/>
             </linearGradient>
             <linearGradient id="gradientUserBHover" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(260, 70%, 65%)" stopOpacity={1}/>
+                <stop offset="5%" stopColor="hsl(260, 70%, 60%)" stopOpacity={1}/>
                 <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={1}/>
             </linearGradient>
         </defs>

@@ -32,7 +32,7 @@ const CustomizedLabel = (props: any) => {
     const { x, y, width, value, index, activeIndex } = props;
     const isActive = index === activeIndex;
 
-    if (value === undefined || value === null || !isActive) return null;
+    if (value === undefined || value === null) return null;
 
     return (
         <text
@@ -44,8 +44,8 @@ const CustomizedLabel = (props: any) => {
             textAnchor="middle"
             style={{
                 opacity: isActive ? 1 : 0,
-                transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
+                transform: `translateY(${isActive ? '0px' : '5px'})`,
+                transition: 'opacity 0.25s ease-in-out, transform 0.25s ease-in-out',
                 pointerEvents: 'none'
             }}
         >
@@ -88,7 +88,7 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
                 <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={1}/>
             </linearGradient>
             <linearGradient id="gradientTimeAHover" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(240, 70%, 68%)" stopOpacity={1}/>
+                <stop offset="5%" stopColor="hsl(240, 70%, 58%)" stopOpacity={1}/>
                 <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={1}/>
             </linearGradient>
             
@@ -97,7 +97,7 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
                 <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={1}/>
             </linearGradient>
             <linearGradient id="gradientTimeBHover" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(25, 80%, 60%)" stopOpacity={1}/>
+                <stop offset="5%" stopColor="hsl(25, 80%, 55%)" stopOpacity={1}/>
                 <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={1}/>
             </linearGradient>
         </defs>
