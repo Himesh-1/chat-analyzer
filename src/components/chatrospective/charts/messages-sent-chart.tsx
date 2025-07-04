@@ -1,9 +1,10 @@
 
 "use client";
 
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
-import { useTheme } from 'next-themes'; 
+import { useTheme } from 'next-themes';
+import { useState } from 'react';
 
 interface MessagesSentChartProps {
   data: CommunicationAnalysisOutput['totalMessagesSent'];
@@ -11,9 +12,37 @@ interface MessagesSentChartProps {
   userBLabel: string;
 }
 
+const CustomizedLabel = (props: any) => {
+    const { x, y, width, height, value, index, activeIndex } = props;
+    const isActive = index === activeIndex;
+
+    if (!value || height < 20) return null;
+
+    return (
+        <text 
+            x={x + width / 2} 
+            y={y + 20}
+            fill={"#fff"}
+            fontSize={14} 
+            fontWeight="bold"
+            textAnchor="middle"
+            style={{
+                opacity: isActive ? 1 : 0,
+                transform: `translateY(${isActive ? '0px' : '10px'})`,
+                transition: 'opacity 0.2s ease-in-out, transform 0.3s ease-in-out',
+                pointerEvents: 'none'
+            }}
+        >
+            {value}
+        </text>
+    );
+};
+
+
 export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSentChartProps) {
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme || 'dark';
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
 
   const chartData = [
@@ -23,22 +52,38 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
   
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';
 
+  const handleMouseEnter = (data: any, index: number) => {
+    setActiveIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveIndex(null);
+  };
+
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 5 }}>
+      <BarChart 
+        data={chartData} 
+        margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
+        onMouseLeave={handleMouseLeave}
+      >
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
         <XAxis dataKey="name" stroke={tickColor} fontSize={12} />
         <YAxis stroke={tickColor} fontSize={12} />
-        <Tooltip
-          cursor={{ fill: 'hsla(var(--muted), 0.5)' }}
-          contentStyle={{
-            backgroundColor: 'hsl(var(--background))',
-            borderColor: 'hsl(var(--border))',
-            color: 'hsl(var(--foreground))',
-            borderRadius: 'var(--radius)',
-          }}
-        />
-        <Bar dataKey="messages" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="messages" radius={[4, 4, 0, 0]}>
+          {chartData.map((entry, index) => (
+            <Cell 
+              cursor="pointer" 
+              fill={entry.fill} 
+              key={`cell-${index}`} 
+              onMouseEnter={() => handleMouseEnter(entry, index)} 
+            />
+          ))}
+          <LabelList 
+              dataKey="messages" 
+              content={<CustomizedLabel activeIndex={activeIndex} />} 
+          />
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
