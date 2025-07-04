@@ -305,11 +305,11 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
 
         <MetricCard title={`Most Used Words (${userALabel})`} icon={MessageCircle} className="bg-card">
-          <FrequentWordsChart words={frequentWords?.userA ?? []} />
+          <FrequentWordsChart data={frequentWords?.userA ?? []} />
         </MetricCard>
 
         <MetricCard title={`Most Used Words (${userBLabel})`} icon={MessageCircle} className="bg-card">
-          <FrequentWordsChart words={frequentWords?.userB ?? []} />
+          <FrequentWordsChart data={frequentWords?.userB ?? []} />
         </MetricCard>
         
         <MetricCard title={`Most Used Emojis (${userALabel})`} icon={SmilePlus} className="bg-card">

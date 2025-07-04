@@ -27,9 +27,9 @@ const CommunicationAnalysisOutputSchema = z.object({
     userB: z.number().describe('Average response time of User B in seconds.'),
   }).describe('Average response time for each user.'),
   frequentWords: z.object({
-    userA: z.array(z.string()).describe('Most frequently used words by User A (top 5-7).'),
-    userB: z.array(z.string()).describe('Most frequently used words by User B (top 5-7).'),
-  }).describe('Most frequently used words by each user.'),
+    userA: z.array(z.object({ word: z.string(), count: z.number() })).describe('Most frequently used words by User A (top 5-7) and their counts.'),
+    userB: z.array(z.object({ word: z.string(), count: z.number() })).describe('Most frequently used words by User B (top 5-7) and their counts.'),
+  }).describe('Most frequently used words by each user, including their counts.'),
   frequentEmojis: z.object({
     userA: z.array(z.string()).describe('Most frequently used emojis by User A (top 5-7).'),
     userB: z.array(z.string()).describe('Most frequently used emojis by User B (top 5-7).'),
@@ -134,7 +134,7 @@ Analyze the following chat log meticulously. Identify two primary participants a
 Existing Metrics:
 - Total messages sent by each user.
 - Average response time for each user in seconds. (Calculate this based on timestamps between messages from different users. If a user sends multiple messages before the other replies, consider the time until the first reply to that block. If timestamps are missing or unclear, provide 0 or a sensible default.)
-- Most frequently used words by each user (top 5-7 unique words, excluding common stop words like 'the', 'a', 'is').
+- Most frequently used words by each user (top 5-7 unique words, excluding common stop words like 'the', 'a', 'is'). For each word, provide its usage count.
 - Most frequently used emojis by each user (top 5-7 unique emojis).
 - Number of compliments given by each user.
 - Identify any ghosting events: a period of no communication from one user to another lasting more than 3 full days (72 hours). For each event, record the user who was ghosted, the approximate start date of silence (YYYY-MM-DD), the approximate end date (YYYY-MM-DD or "Ongoing" if it didn't resume by the end of the log), and the duration in days. If no ghosting, return an empty array.
