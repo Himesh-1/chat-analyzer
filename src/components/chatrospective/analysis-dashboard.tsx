@@ -145,7 +145,7 @@ function AchievementsSection({ analysisData, userALabel, userBLabel }: { analysi
   }
 
   return (
-    <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300 lg:col-span-3 bg-card">
+    <Card className="shadow-lg hover:shadow-primary/20 transition-all ease-in-out duration-300 hover:scale-[1.02] lg:col-span-3 bg-card">
       <CardHeader>
         <CardTitle className="text-lg font-semibold flex items-center text-card-foreground">
           <Award className="mr-2 h-5 w-5 text-primary" /> Chat Achievements
@@ -201,7 +201,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
       </div>
 
       {aiRelationshipSummary && (
-        <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300 lg:col-span-3 bg-card">
+        <Card className="shadow-lg hover:shadow-primary/20 transition-all ease-in-out duration-300 hover:scale-[1.02] lg:col-span-3 bg-card">
           <CardHeader>
             <CardTitle className="text-xl font-semibold flex items-center text-card-foreground">
               <Brain className="mr-2 h-6 w-6 text-primary" /> AI Relationship Summary

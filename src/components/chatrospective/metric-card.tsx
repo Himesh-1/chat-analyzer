@@ -12,7 +12,7 @@ interface MetricCardProps {
 
 export function MetricCard({ title, icon: Icon, children, className, chartHeight }: MetricCardProps) {
   return (
-    <Card className={cn("shadow-lg hover:shadow-primary/30 transition-shadow duration-300", className)}>
+    <Card className={cn("shadow-lg hover:shadow-primary/30 transition-all ease-in-out duration-300 hover:scale-[1.02]", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
