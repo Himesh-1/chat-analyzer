@@ -7,6 +7,7 @@ import { MetricCard } from './metric-card';
 import { MessagesSentChart } from './charts/messages-sent-chart';
 import { AvgResponseTimeChart } from './charts/avg-response-time-chart';
 import { FrequentWordsChart } from './charts/frequent-words-chart';
+import { InterestLevelChart } from './charts/interest-level-chart';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -254,10 +255,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
         {interestLevel && (
           <MetricCard title="Interest Level" icon={TrendingUp} className="bg-card">
-            <div className="space-y-2">
-              <div className="text-lg text-card-foreground">{userALabel}: <Badge variant={interestLevel.userA > 60 ? "default" : "secondary"}>{interestLevel.userA?.toFixed(0) ?? 'N/A'}%</Badge></div>
-              <div className="text-lg text-card-foreground">{userBLabel}: <Badge variant={interestLevel.userB > 60 ? "default" : "secondary"}>{interestLevel.userB?.toFixed(0) ?? 'N/A'}%</Badge></div>
-            </div>
+            <InterestLevelChart data={interestLevel} userALabel={userALabel} userBLabel={userBLabel} />
           </MetricCard>
         )}
         
@@ -394,24 +392,24 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </MetricCard>
         )}
 
-        {mostUsedPhrases?.userA && mostUsedPhrases.userA.length > 0 && mostUsedPhrases.userA[0] !== "N/A" && (
+        {mostUsedPhrases?.userA && mostUsedPhrases.userA.length > 0 && mostUsedPhrases.userA[0].word !== "N/A" && (
             <MetricCard title={`Most Used Phrases (${userALabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userA.map((phrase, i) => (
-                            <li key={`ua-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase}</li>
+                            <li key={`ua-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase.word}</li>
                         ))}
                     </ul>
                 </ScrollArea>
             </MetricCard>
         )}
 
-        {mostUsedPhrases?.userB && mostUsedPhrases.userB.length > 0 && mostUsedPhrases.userB[0] !== "N/A" && (
+        {mostUsedPhrases?.userB && mostUsedPhrases.userB.length > 0 && mostUsedPhrases.userB[0].word !== "N/A" && (
             <MetricCard title={`Most Used Phrases (${userBLabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userB.map((phrase, i) => (
-                            <li key={`ub-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase}</li>
+                            <li key={`ub-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase.word}</li>
                         ))}
                     </ul>
                 </ScrollArea>
@@ -463,3 +461,5 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
     </div>
   );
 }
+
+    
