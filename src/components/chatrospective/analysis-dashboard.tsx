@@ -256,6 +256,16 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
         {interestLevel && (
           <MetricCard title="Interest Level" icon={TrendingUp} className="bg-card">
             <InterestLevelChart data={interestLevel} userALabel={userALabel} userBLabel={userBLabel} />
+            <div className="mt-4 flex justify-around text-center">
+              <div>
+                <p className="text-xl font-bold text-primary">{interestLevel.userA.toFixed(0)}%</p>
+                <p className="text-xs text-muted-foreground">{userALabel}</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-primary">{interestLevel.userB.toFixed(0)}%</p>
+                <p className="text-xs text-muted-foreground">{userBLabel}</p>
+              </div>
+            </div>
           </MetricCard>
         )}
         
@@ -461,5 +471,3 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
     </div>
   );
 }
-
-    
