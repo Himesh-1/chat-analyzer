@@ -29,7 +29,7 @@ const CustomizedLabel = (props: any) => {
             style={{
                 opacity: isActive ? 1 : 0,
                 transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
+                transition: 'opacity 0.15s ease-in-out, transform 0.15s ease-in-out',
                 pointerEvents: 'none'
             }}
         >
