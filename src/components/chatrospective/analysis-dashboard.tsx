@@ -1,9 +1,11 @@
+
 "use client";
 
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
 import { MetricCard } from './metric-card';
 import { MessagesSentChart } from './charts/messages-sent-chart';
 import { AvgResponseTimeChart } from './charts/avg-response-time-chart';
+import { FrequentWordsChart } from './charts/frequent-words-chart';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -303,23 +305,11 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
 
 
         <MetricCard title={`Most Used Words (${userALabel})`} icon={MessageCircle} className="bg-card">
-          <ScrollArea className="h-40">
-            <ul className="space-y-1 text-sm">
-              {frequentWords?.userA && frequentWords.userA.length > 0 ? frequentWords.userA.map((word, i) => (
-                <li key={`ua-word-${i}`} className="p-1 bg-background rounded-sm text-foreground">{word}</li>
-              )) : <li className="text-muted-foreground">No specific words found.</li>}
-            </ul>
-          </ScrollArea>
+          <FrequentWordsChart words={frequentWords?.userA ?? []} />
         </MetricCard>
 
         <MetricCard title={`Most Used Words (${userBLabel})`} icon={MessageCircle} className="bg-card">
-          <ScrollArea className="h-40">
-            <ul className="space-y-1 text-sm">
-              {frequentWords?.userB && frequentWords.userB.length > 0 ? frequentWords.userB.map((word, i) => (
-                <li key={`ub-word-${i}`} className="p-1 bg-background rounded-sm text-foreground">{word}</li>
-              )) : <li className="text-muted-foreground">No specific words found.</li>}
-            </ul>
-          </ScrollArea>
+          <FrequentWordsChart words={frequentWords?.userB ?? []} />
         </MetricCard>
         
         <MetricCard title={`Most Used Emojis (${userALabel})`} icon={SmilePlus} className="bg-card">
