@@ -45,7 +45,7 @@ const CustomizedLabel = (props: any) => {
             style={{
                 opacity: isActive ? 1 : 0,
                 transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.2s ease, transform 0.2s ease',
+                transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
                 pointerEvents: 'none'
             }}
         >
@@ -60,8 +60,8 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const chartData = [
-    { name: userALabel, time: data.userA, fill: "hsl(var(--chart-3))" },
-    { name: userBLabel, time: data.userB, fill: "hsl(var(--chart-4))" },
+    { name: userALabel, time: data.userA },
+    { name: userBLabel, time: data.userB },
   ];
 
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';
@@ -82,6 +82,25 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
         margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
         onMouseLeave={handleMouseLeave}
       >
+        <defs>
+            <linearGradient id="gradientTimeA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="gradientTimeAHover" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(240, 70%, 68%)" stopOpacity={1}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={1}/>
+            </linearGradient>
+            
+            <linearGradient id="gradientTimeB" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-4))" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="gradientTimeBHover" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(25, 80%, 60%)" stopOpacity={1}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={1}/>
+            </linearGradient>
+        </defs>
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
         <XAxis dataKey="name" stroke={tickColor} fontSize={12} />
         <YAxis
@@ -98,13 +117,13 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
             {chartData.map((entry, index) => (
                 <Cell
                   cursor="pointer"
-                  fill={entry.fill}
+                  fill={
+                    index === 0
+                      ? activeIndex === index ? 'url(#gradientTimeAHover)' : 'url(#gradientTimeA)'
+                      : activeIndex === index ? 'url(#gradientTimeBHover)' : 'url(#gradientTimeB)'
+                  }
                   key={`cell-${index}`}
                   onMouseEnter={() => handleMouseEnter(entry, index)}
-                  style={{
-                    filter: activeIndex === index ? 'drop-shadow(0px 4px 8px rgba(0,0,0,0.2))' : 'none',
-                    transition: 'filter 0.2s ease',
-                  }}
                 />
             ))}
             <LabelList

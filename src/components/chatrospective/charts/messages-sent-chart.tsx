@@ -29,7 +29,7 @@ const CustomizedLabel = (props: any) => {
             style={{
                 opacity: isActive ? 1 : 0,
                 transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.2s ease, transform 0.2s ease',
+                transition: 'opacity 0.15s ease-out, transform 0.15s ease-out',
                 pointerEvents: 'none'
             }}
         >
@@ -44,10 +44,9 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
   const currentTheme = resolvedTheme || 'dark';
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-
   const chartData = [
-    { name: userALabel, messages: data.userA, fill: "hsl(var(--chart-1))" },
-    { name: userBLabel, messages: data.userB, fill: "hsl(var(--chart-2))" },
+    { name: userALabel, messages: data.userA },
+    { name: userBLabel, messages: data.userB },
   ];
   
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';
@@ -67,6 +66,25 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
         margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
         onMouseLeave={handleMouseLeave}
       >
+        <defs>
+            <linearGradient id="gradientUserA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="gradientUserAHover" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(330, 70%, 60%)" stopOpacity={1}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={1}/>
+            </linearGradient>
+            
+            <linearGradient id="gradientUserB" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={1}/>
+            </linearGradient>
+            <linearGradient id="gradientUserBHover" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(260, 70%, 65%)" stopOpacity={1}/>
+                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={1}/>
+            </linearGradient>
+        </defs>
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
         <XAxis dataKey="name" stroke={tickColor} fontSize={12} />
         <YAxis stroke={tickColor} fontSize={12} />
@@ -74,13 +92,13 @@ export function MessagesSentChart({ data, userALabel, userBLabel }: MessagesSent
           {chartData.map((entry, index) => (
             <Cell
               cursor="pointer"
-              fill={entry.fill}
+              fill={
+                index === 0
+                  ? activeIndex === index ? 'url(#gradientUserAHover)' : 'url(#gradientUserA)'
+                  : activeIndex === index ? 'url(#gradientUserBHover)' : 'url(#gradientUserB)'
+              }
               key={`cell-${index}`}
               onMouseEnter={() => handleMouseEnter(entry, index)}
-              style={{
-                filter: activeIndex === index ? 'drop-shadow(0px 4px 8px rgba(0,0,0,0.2))' : 'none',
-                transition: 'filter 0.2s ease',
-              }}
             />
           ))}
           <LabelList
