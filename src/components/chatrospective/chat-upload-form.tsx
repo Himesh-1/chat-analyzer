@@ -8,15 +8,22 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, UploadCloud, FileText, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+// AI-based flows
+import { chatLogParsing, type ChatLogParsingOutput } from '@/ai/flows/chat-log-parsing';
+import { communicationAnalysis, type CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
+
+// Deterministic calculation service
+import { analyzeChatMetrics, type DeterministicAnalysis } from '@/services/chat-analyzer';
+
+// Combined type for the final analysis result
+export type FullAnalysisOutput = DeterministicAnalysis & CommunicationAnalysisOutput;
+
 interface ChatUploadFormProps {
-  onAnalysisComplete: (fileName: string, fileContent: string, analysisData: any, parsedData: any) => void; // Use specific types
+  onAnalysisComplete: (fileName: string, fileContent: string, analysisData: FullAnalysisOutput, parsedData: ChatLogParsingOutput) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
 }
 
-// These would be imported from your AI flows
-import { chatLogParsing, ChatLogParsingOutput } from '@/ai/flows/chat-log-parsing';
-import { communicationAnalysis, CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
 
 export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: ChatUploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
@@ -92,26 +99,25 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
 
     setIsLoading(true);
     try {
-      // Step 1: Parse chat log (optional based on direct need for dashboard, but good practice)
-      // For now, we assume it is useful for context or future features.
-      // The main analysis flow will handle the raw chat log.
-      let parsedDataForCompletion: ChatLogParsingOutput = { messages: [] };
-      try {
-         parsedDataForCompletion = await chatLogParsing({ chatLog: fileContent });
-      } catch (parseError) {
-        console.warn("Chat log parsing failed, proceeding with raw content for analysis:", parseError);
-        // Not critical if main analysis can handle raw log
+      // Step 1: Parse chat log using AI to handle messy formats
+      const parsedData = await chatLogParsing({ chatLog: fileContent });
+      if (!parsedData || !parsedData.messages) {
+        throw new Error("Failed to parse the chat log.");
       }
 
-
-      // Step 2: Perform communication analysis
-      const analysisData: CommunicationAnalysisOutput = await communicationAnalysis({ chatLog: fileContent });
+      // Step 2: Perform deterministic calculations on the parsed data
+      const deterministicData = await analyzeChatMetrics(parsedData);
       
-      if (!analysisData) {
+      // Step 3: Perform AI-based analysis for subjective metrics
+      const aiData = await communicationAnalysis({ chatLog: fileContent });
+      if (!aiData) {
         throw new Error("Communication analysis failed to return data.");
       }
 
-      onAnalysisComplete(fileName, fileContent, analysisData, parsedDataForCompletion);
+      // Step 4: Combine deterministic and AI results
+      const fullAnalysisData: FullAnalysisOutput = { ...deterministicData, ...aiData };
+
+      onAnalysisComplete(fileName, fileContent, fullAnalysisData, parsedData);
 
     } catch (error) {
       console.error("Analysis error:", error);

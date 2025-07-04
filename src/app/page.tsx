@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChatUploadForm } from '@/components/chatrospective/chat-upload-form';
+import { ChatUploadForm, type FullAnalysisOutput } from '@/components/chatrospective/chat-upload-form';
 import { AnalysisDashboard } from '@/components/chatrospective/analysis-dashboard';
 import { ChatHeader } from '@/components/chatrospective/chat-header';
 import type { ChatLogParsingOutput } from '@/ai/flows/chat-log-parsing';
-import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
 import { ThemeProvider } from "next-themes"
 
 
@@ -20,7 +19,7 @@ export default function Home() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [parsedData, setParsedData] = useState<ChatLogParsingOutput | null>(null);
-  const [analysisData, setAnalysisData] = useState<CommunicationAnalysisOutput | null>(null);
+  const [analysisData, setAnalysisData] = useState<FullAnalysisOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -49,7 +48,7 @@ export default function Home() {
     (
       uploadedFileName: string,
       uploadedFileContent: string,
-      completedAnalysisData: CommunicationAnalysisOutput,
+      completedAnalysisData: FullAnalysisOutput,
       completedParsedData: ChatLogParsingOutput
     ) => {
       setFileName(uploadedFileName);

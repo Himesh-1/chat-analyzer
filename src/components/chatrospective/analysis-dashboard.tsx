@@ -2,6 +2,7 @@
 "use client";
 
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
+import type { DeterministicAnalysis } from '@/services/chat-analyzer';
 import { MetricCard } from './metric-card';
 import { MessagesSentChart } from './charts/messages-sent-chart';
 import { AvgResponseTimeChart } from './charts/avg-response-time-chart';
@@ -20,14 +21,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
+// The full analysis object is a combination of deterministic and AI-driven metrics.
+type FullAnalysisOutput = DeterministicAnalysis & CommunicationAnalysisOutput;
+
 interface AnalysisDashboardProps {
-  analysisData: CommunicationAnalysisOutput;
+  analysisData: FullAnalysisOutput;
   fileName: string | null;
   onReset: () => void;
 }
 
 interface RelationshipStoryProps {
-  analysisData: CommunicationAnalysisOutput;
+  analysisData: FullAnalysisOutput;
   userALabel: string;
   userBLabel: string;
 }
@@ -35,7 +39,7 @@ interface RelationshipStoryProps {
 function formatDuration(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return 'N/A';
   if (seconds === 0) return '0s';
-  if (seconds < 60) return `${seconds.toFixed(1)}s`;
+  if (seconds < 60) return `${seconds.toFixed(0)}s`;
 
   if (seconds < 3600) {
     const minutes = Math.floor(seconds / 60);
@@ -88,7 +92,7 @@ interface Achievement {
   user?: 'User A' | 'User B' | 'Overall';
 }
 
-function AchievementsSection({ analysisData, userALabel, userBLabel }: { analysisData: CommunicationAnalysisOutput, userALabel: string, userBLabel: string }) {
+function AchievementsSection({ analysisData, userALabel, userBLabel }: { analysisData: FullAnalysisOutput, userALabel: string, userBLabel: string }) {
   const achievements: Achievement[] = [];
 
   // User A Achievements

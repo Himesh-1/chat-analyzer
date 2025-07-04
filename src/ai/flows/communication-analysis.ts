@@ -2,7 +2,7 @@
 // src/ai/flows/communication-analysis.ts
 'use server';
 /**
- * @fileOverview A communication analysis AI agent.
+ * @fileOverview A communication analysis AI agent for subjective metrics.
  *
  * - communicationAnalysis - A function that handles the communication analysis process.
  * - CommunicationAnalysisInput - The input type for the communicationAnalysis function.
@@ -18,22 +18,6 @@ const CommunicationAnalysisInputSchema = z.object({
 export type CommunicationAnalysisInput = z.infer<typeof CommunicationAnalysisInputSchema>;
 
 const CommunicationAnalysisOutputSchema = z.object({
-  totalMessagesSent: z.object({
-    userA: z.number().describe('Total messages sent by User A.'),
-    userB: z.number().describe('Total messages sent by User B.'),
-  }).describe('Total messages sent by each user.'),
-  averageResponseTime: z.object({
-    userA: z.number().describe('Average response time of User A in seconds.'),
-    userB: z.number().describe('Average response time of User B in seconds.'),
-  }).describe('Average response time for each user.'),
-  frequentWords: z.object({
-    userA: z.array(z.object({ word: z.string(), count: z.number() })).describe('Most frequently used words by User A (top 5-7) and their counts.'),
-    userB: z.array(z.object({ word: z.string(), count: z.number() })).describe('Most frequently used words by User B (top 5-7) and their counts.'),
-  }).describe('Most frequently used words by each user, including their counts.'),
-  frequentEmojis: z.object({
-    userA: z.array(z.string()).describe('Most frequently used emojis by User A (top 5-7).'),
-    userB: z.array(z.string()).describe('Most frequently used emojis by User B (top 5-7).'),
-  }).describe('Most frequently used emojis by each user.'),
   complimentCount: z.object({
     userA: z.number().describe('Number of compliments given by User A.'),
     userB: z.number().describe('Number of compliments given by User B.'),
@@ -127,58 +111,38 @@ const prompt = ai.definePrompt({
   name: 'communicationAnalysisPrompt',
   input: {schema: CommunicationAnalysisInputSchema},
   output: {schema: CommunicationAnalysisOutputSchema},
-  prompt: `You are an AI expert in relationship dynamics and communication patterns, specializing in analyzing chat logs to extract key communication metrics, potential red flags, and insightful highlights.
+  prompt: `You are an AI expert in relationship dynamics and communication patterns, specializing in analyzing chat logs to extract key subjective and qualitative metrics.
 
-Analyze the following chat log meticulously. Identify two primary participants as "User A" and "User B". If names are present, assign them consistently. If only one participant is clear, assign them as "User A" and use default/N/A values for "User B". Extract the following information:
+Analyze the following chat log meticulously. Identify two primary participants as "User A" and "User B". If names are present, assign them consistently. If only one participant is clear, assign them as "User A" and use default/N/A values for "User B". Do NOT calculate message counts, response times, or word/emoji frequencies. Focus ONLY on the following information:
 
-Existing Metrics:
-- Total messages sent by each user.
-- Average response time for each user in seconds. (Calculate this based on timestamps between messages from different users. If a user sends multiple messages before the other replies, consider the time until the first reply to that block. If timestamps are missing or unclear, provide 0 or a sensible default.)
-- Most frequently used words by each user (top 5-7 unique words, excluding common stop words like 'the', 'a', 'is'). For each word, provide its usage count.
-- Most frequently used emojis by each user (top 5-7 unique emojis).
+Subjective Metrics:
 - Number of compliments given by each user.
-- Identify any ghosting events: a period of no communication from one user to another lasting more than 3 full days (72 hours). For each event, record the user who was ghosted, the approximate start date of silence (YYYY-MM-DD), the approximate end date (YYYY-MM-DD or "Ongoing" if it didn't resume by the end of the log), and the duration in days. If no ghosting, return an empty array.
-
-New Core Analysis & Red Flags:
-- Interest Level: For each user (User A, User B), provide an engagement percentage (0-100) reflecting their active participation, effort in replies, and initiation of topics. Consider factors like reply length, asking questions, and responsiveness. If unclear, use 50 as a default.
-- Mentions of Exes: Count how many times each user (User A, User B) mentions ex-partners, past relationships, or dates with other people.
-- Insult Count: Count the number of insults, aggressive, rude, or highly negative phrases used by each user (User A, User B).
-- One-Sided Conversation Score: Provide a score from 0 (perfectly balanced) to 10 (very one-sided). This score should reflect if one user significantly dominates the conversation in terms of message volume, length, or consistently initiates topics while the other gives minimal replies. If balanced or unclear, use a score around 2-3.
-- Double Texting & No Reply Count: For each user (User A, User B), count instances where they sent two or more consecutive messages without an intermediate reply from the other user, especially if the subsequent message seems like a follow-up due to lack of response.
-- Overall Sentiment: Determine the overall sentiment of messages from each user (User A, User B). Categorize as 'Predominantly Positive', 'Mixed', 'Predominantly Negative', or 'Neutral'. Default to 'Neutral' if unclear.
-- Positivity vs. Negativity Ratio: For each user (User A, User B), provide a simplified ratio or description comparing their positive-toned messages versus negative-toned messages (e.g., "3:1 Positive", "1:2 Negative", "Balanced", "Mostly Neutral", "Insufficient data").
-- Toxicity Score:
-    - Overall: A score from 0 (very healthy, respectful) to 10 (very toxic, hostile) for the entire conversation.
-    - User A: A toxicity score (0-10) for User A's contributions.
-    - User B: A toxicity score (0-10) for User B's contributions.
-  Consider insults, passive-aggression, excessive negativity, and manipulative language. Default to low scores if content is benign.
+- Identify any ghosting events: a period of no communication from one user to another lasting more than 3 full days (72 hours).
+- Interest Level: For each user, provide an engagement percentage (0-100).
+- Mentions of Exes: Count how many times each user mentions ex-partners.
+- Insult Count: Count the number of insults or aggressive phrases.
+- One-Sided Conversation Score: Provide a score from 0 (balanced) to 10 (one-sided).
+- Double Texting & No Reply Count: Count instances of double texting.
+- Overall Sentiment: Determine the sentiment for each user (e.g., 'Positive', 'Mixed', 'Negative').
+- Positivity vs. Negativity Ratio: Provide a description of the ratio.
+- Toxicity Score (Overall, User A, User B) from 0 to 10.
 
 Conversation Highlights:
-- Longest Message: Identify the single longest message sent. Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and its character length (or 0).
-- Most Emotional Message: Identify a message that stands out as particularly emotionally charged (positive or negative). Provide the sender ("User A" or "User B" or "N/A"), its text content (or "N/A"), and the predominant emotion detected (e.g., Joy, Sadness, Anger, Excitement, Frustration, Love, or "N/A").
-- Quote of the Year: Select one short, impactful, memorable, funny, or very representative quote from the entire conversation. If none stands out, use "N/A".
-- Most Used Phrases: For each user (User A, User B), identify their top 3-5 most frequently used short phrases (2-5 words long). Exclude extremely common pleasantries like "how are you" or "good morning" unless they are used with unusual frequency or in a unique way. If not determinable, return an empty array or ["N/A"].
-- Ghost Probability Score: Based on the entire chat log, particularly response patterns, unanswered messages, and overall engagement, estimate a "ghost probability score" from 0 to 100. A score of 0 means very unlikely to ghost/be ghosted, 50 means neutral or hard to tell, and 100 means a very high probability or clear evidence of ghosting within the log.
-
-NEWLY ADDED FEATURES:
-- AI Relationship Summary (aiRelationshipSummary): Generate a 3-5 sentence, human-like summary of the relationship dynamics observed in the chat. This summary can adopt a poetic, humorous, or brutally honest tone, as you see fit to best capture the essence of the interaction. Focus on key patterns, overall vibe, and what the chat reveals about their connection.
-- Compatibility Score (compatibilityScore): Estimate a compatibility score between User A and User B, from 0 (very incompatible) to 100 (highly compatible). Base this on factors like message balance (volume and length), emotional reciprocation (do they match each other's emotional tone?), shared interests evident in the chat, overall tone (positive/negative, supportive/critical), and ghosting history. If it's hard to determine or very neutral, assign a score around 50.
-- Conversation Health Score (conversationHealthScore): Provide a score from 0 (very unhealthy) to 10 (exceptionally healthy) that assesses the overall health of the conversation. Consider factors like:
-    - Fairness in response times (is one person consistently waiting much longer?).
-    - Tone balance (is it generally positive, or does negativity/toxicity dominate?).
-    - Levels of toxicity or aggression.
-    - Respectful engagement (do they acknowledge each other, seem to listen?).
-    A score of 5 can be neutral/average.
-- Sarcasm Detection (sarcasmDetection):
-    - level: Provide a qualitative assessment of the level of sarcasm or passive-aggressive tones in the conversation (e.g., "Not Detected", "Low", "Medium", "High").
-    - example: If sarcasm/passive-aggression is detected (Medium or High), provide one brief, representative example quote from the chat. If Low or Not Detected, this can be "N/A".
+- Longest Message: Identify the single longest message.
+- Most Emotional Message: Identify a message that is particularly emotionally charged.
+- Quote of the Year: Select one short, impactful, memorable, or funny quote.
+- Most Used Phrases: Identify top 3-5 most frequently used phrases (2-5 words).
+- Ghost Probability Score: Estimate a probability from 0 to 100.
+- AI Relationship Summary: Generate a 3-5 sentence, human-like summary.
+- Compatibility Score: Estimate a score from 0 to 100.
+- Conversation Health Score: Provide a score from 0 to 10.
+- Sarcasm Detection: Assess the level and provide an example if applicable.
 
 Chat Log:
 {{chatLog}}
 
-Ensure that the output is a single, valid JSON object that strictly adheres to the CommunicationAnalysisOutputSchema. Do not include any conversational text, explanations, or apologies outside of the JSON structure.
-If the chat log is too short or lacks enough interaction to determine some metrics (e.g., average response time, ghosting), use appropriate default values like 0 for counts, "N/A" or "Insufficient data" for strings/ratios where applicable, or a neutral/low score for scaled metrics if calculation is impossible. Be robust.
-Assign "User A" and "User B" consistently. If only one user is evident, populate User A fields and use defaults for User B.
+Ensure that the output is a single, valid JSON object that strictly adheres to the provided output schema. Do not include any conversational text, explanations, or apologies outside of the JSON structure.
+If the chat log is too short or lacks enough interaction to determine some metrics, use appropriate default values like 0 for counts, "N/A" for strings, or neutral scores. Be robust.
 `,
 });
 
