@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
@@ -31,6 +30,22 @@ interface RelationshipStoryProps {
   userBLabel: string;
 }
 
+function formatDuration(seconds: number): string {
+  if (isNaN(seconds) || seconds < 0) return 'N/A';
+  if (seconds === 0) return '0s';
+  if (seconds < 60) return `${seconds.toFixed(1)}s`;
+
+  if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.round(seconds % 60);
+    return `${minutes}m ${remainingSeconds}s`;
+  }
+
+  const hours = Math.floor(seconds / 3600);
+  const remainingMinutes = Math.round((seconds % 3600) / 60);
+  return `${hours}h ${remainingMinutes}m`;
+}
+
 function RelationshipStory({ analysisData, userALabel, userBLabel }: RelationshipStoryProps) {
   const { 
     totalMessagesSent, averageResponseTime, complimentCount, ghostingEvents, 
@@ -38,7 +53,7 @@ function RelationshipStory({ analysisData, userALabel, userBLabel }: Relationshi
   } = analysisData;
 
   let story = `In your chat, ${userALabel} sent ${totalMessagesSent.userA} messages, while ${userBLabel} sent ${totalMessagesSent.userB}. `;
-  story += `On average, ${userALabel} replied in ${averageResponseTime.userA?.toFixed(1) ?? 'N/A'}s and ${userBLabel} in ${averageResponseTime.userB?.toFixed(1) ?? 'N/A'}s. `;
+  story += `On average, ${userALabel} replied in ${formatDuration(averageResponseTime.userA)} and ${userBLabel} in ${formatDuration(averageResponseTime.userB)}. `;
   story += `${userALabel} gave ${complimentCount.userA} compliments, and ${userBLabel} offered ${complimentCount.userB}. `;
   
   if (overallSentiment?.userA && overallSentiment?.userB) {
@@ -196,12 +211,32 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
       <RelationshipStory analysisData={analysisData} userALabel={userALabel} userBLabel={userBLabel} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <MetricCard title="Total Messages Sent" icon={Users} chartHeight="230px" className="bg-card">
+        <MetricCard title="Total Messages Sent" icon={Users} className="bg-card">
           {totalMessagesSent && <MessagesSentChart data={totalMessagesSent} userALabel={userALabel} userBLabel={userBLabel} />}
+          <div className="mt-4 flex justify-around text-center">
+            <div>
+              <p className="text-xl font-bold text-primary">{totalMessagesSent?.userA ?? 'N/A'}</p>
+              <p className="text-xs text-muted-foreground">{userALabel}</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-primary">{totalMessagesSent?.userB ?? 'N/A'}</p>
+              <p className="text-xs text-muted-foreground">{userBLabel}</p>
+            </div>
+          </div>
         </MetricCard>
 
-        <MetricCard title="Average Response Time" icon={Timer} chartHeight="230px" className="bg-card">
+        <MetricCard title="Average Response Time" icon={Timer} className="bg-card">
           {averageResponseTime && <AvgResponseTimeChart data={averageResponseTime} userALabel={userALabel} userBLabel={userBLabel} />}
+          <div className="mt-4 flex justify-around text-center">
+            <div>
+              <p className="text-xl font-bold text-primary">{averageResponseTime ? formatDuration(averageResponseTime.userA) : 'N/A'}</p>
+              <p className="text-xs text-muted-foreground">{userALabel}</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-primary">{averageResponseTime ? formatDuration(averageResponseTime.userB) : 'N/A'}</p>
+              <p className="text-xs text-muted-foreground">{userBLabel}</p>
+            </div>
+          </div>
         </MetricCard>
 
         <MetricCard title="Compliment Counter" icon={Award} className="bg-card">
