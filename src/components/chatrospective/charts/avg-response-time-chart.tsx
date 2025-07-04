@@ -15,7 +15,7 @@ interface AvgResponseTimeChartProps {
 function formatDuration(seconds: number): string {
   if (isNaN(seconds) || seconds < 0) return 'N/A';
   if (seconds === 0) return '0s';
-  if (seconds < 60) return `${seconds.toFixed(1)}s`;
+  if (seconds < 60) return `${seconds.toFixed(0)}s`;
 
   if (seconds < 3600) {
     const minutes = Math.floor(seconds / 60);
@@ -29,23 +29,23 @@ function formatDuration(seconds: number): string {
 }
 
 const CustomizedLabel = (props: any) => {
-    const { x, y, width, height, value, index, activeIndex } = props;
+    const { x, y, width, value, index, activeIndex } = props;
     const isActive = index === activeIndex;
 
-    if (value === undefined || value === null || height < 20) return null;
+    if (value === undefined || value === null || !isActive) return null;
 
     return (
-        <text 
-            x={x + width / 2} 
+        <text
+            x={x + width / 2}
             y={y + 20}
             fill={"#fff"}
-            fontSize={14} 
+            fontSize={14}
             fontWeight="bold"
             textAnchor="middle"
             style={{
                 opacity: isActive ? 1 : 0,
                 transform: `translateY(${isActive ? '0px' : '10px'})`,
-                transition: 'opacity 0.2s ease-in-out, transform 0.3s ease-in-out',
+                transition: 'opacity 0.2s ease, transform 0.2s ease',
                 pointerEvents: 'none'
             }}
         >
@@ -77,16 +77,16 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart 
-        data={chartData} 
+      <BarChart
+        data={chartData}
         margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
         onMouseLeave={handleMouseLeave}
       >
         <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
         <XAxis dataKey="name" stroke={tickColor} fontSize={12} />
-        <YAxis 
-            label={{ value: 'Time', angle: -90, position: 'insideLeft', fill: tickColor, fontSize: 10 }} 
-            stroke={tickColor} 
+        <YAxis
+            label={{ value: 'Time', angle: -90, position: 'insideLeft', fill: tickColor, fontSize: 10 }}
+            stroke={tickColor}
             fontSize={12}
             tickFormatter={(value) => {
               if (value < 60) return `${value}s`;
@@ -96,16 +96,20 @@ export function AvgResponseTimeChart({ data, userALabel, userBLabel }: AvgRespon
          />
         <Bar dataKey="time" radius={[4, 4, 0, 0]}>
             {chartData.map((entry, index) => (
-                <Cell 
-                  cursor="pointer" 
-                  fill={entry.fill} 
-                  key={`cell-${index}`} 
-                  onMouseEnter={() => handleMouseEnter(entry, index)} 
+                <Cell
+                  cursor="pointer"
+                  fill={entry.fill}
+                  key={`cell-${index}`}
+                  onMouseEnter={() => handleMouseEnter(entry, index)}
+                  style={{
+                    filter: activeIndex === index ? 'drop-shadow(0px 4px 8px rgba(0,0,0,0.2))' : 'none',
+                    transition: 'filter 0.2s ease',
+                  }}
                 />
             ))}
-            <LabelList 
-                dataKey="time" 
-                content={<CustomizedLabel activeIndex={activeIndex} />} 
+            <LabelList
+                dataKey="time"
+                content={<CustomizedLabel activeIndex={activeIndex} />}
             />
         </Bar>
       </BarChart>
