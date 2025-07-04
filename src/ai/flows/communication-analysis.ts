@@ -17,6 +17,12 @@ const CommunicationAnalysisInputSchema = z.object({
 });
 export type CommunicationAnalysisInput = z.infer<typeof CommunicationAnalysisInputSchema>;
 
+const RedFlagSchema = z.object({
+  sender: z.string().describe('The sender of the red flag message (User A or User B).'),
+  message: z.string().describe('The content of the message identified as a red flag.'),
+  reason: z.string().describe('A brief explanation of why this message is considered a red flag (e.g., "Controlling behavior", "Gaslighting", "Disrespectful language").')
+});
+
 const CommunicationAnalysisOutputSchema = z.object({
   complimentCount: z.object({
     userA: z.number().describe('Number of compliments given by User A.'),
@@ -99,7 +105,8 @@ const CommunicationAnalysisOutputSchema = z.object({
     level: z.string().describe('Qualitative assessment of sarcasm or passive-aggressive tones (e.g., Low, Medium, High, Not Detected).'),
     example: z.string().optional().describe('A brief example of a sarcastic or passive-aggressive message if detected, otherwise "N/A".'),
   }).describe('Detection of sarcasm or passive-aggressive tones in the conversation.').optional(),
-
+  
+  redFlags: z.array(RedFlagSchema).describe('A list of up to 5 messages that could be considered red flags in the conversation.').optional(),
 });
 export type CommunicationAnalysisOutput = z.infer<typeof CommunicationAnalysisOutputSchema>;
 
@@ -127,7 +134,7 @@ Subjective Metrics:
 - Positivity vs. Negativity Ratio: Provide a description of the ratio.
 - Toxicity Score (Overall, User A, User B) from 0 to 10.
 
-Conversation Highlights:
+Conversation Highlights & Risks:
 - Longest Message: Identify the single longest message.
 - Most Emotional Message: Identify a message that is particularly emotionally charged.
 - Quote of the Year: Select one short, impactful, memorable, or funny quote.
@@ -137,6 +144,8 @@ Conversation Highlights:
 - Compatibility Score: Estimate a score from 0 to 100.
 - Conversation Health Score: Provide a score from 0 to 10.
 - Sarcasm Detection: Assess the level and provide an example if applicable.
+- Red Flags: Identify up to 5 messages that could be considered red flags. For each, provide the sender, the message text, and a brief reason (e.g., "Controlling behavior", "Gaslighting", "Love bombing", "Disrespectful language"). If no significant red flags are found, return an empty array.
+
 
 Chat Log:
 {{chatLog}}

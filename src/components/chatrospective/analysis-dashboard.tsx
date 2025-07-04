@@ -175,7 +175,7 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
     interestLevel, mentionsOfExes, insultCount, oneSidedConversationScore, doubleTextNoReplyCount,
     overallSentiment, positivityNegativityRatio, toxicityScore, longestMessage, mostEmotionalMessage,
     quoteOfTheYear, mostUsedPhrases, ghostProbabilityScore,
-    aiRelationshipSummary, compatibilityScore, conversationHealthScore, sarcasmDetection
+    aiRelationshipSummary, compatibilityScore, conversationHealthScore, sarcasmDetection, redFlags
   } = analysisData;
 
   const userALabel = anonymousMode ? "Participant 1" : "User A";
@@ -402,24 +402,24 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
           </MetricCard>
         )}
 
-        {mostUsedPhrases?.userA && mostUsedPhrases.userA.length > 0 && mostUsedPhrases.userA[0].word !== "N/A" && (
+        {mostUsedPhrases?.userA && mostUsedPhrases.userA.length > 0 && mostUsedPhrases.userA[0] !== "N/A" && (
             <MetricCard title={`Most Used Phrases (${userALabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userA.map((phrase, i) => (
-                            <li key={`ua-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase.word}</li>
+                            <li key={`ua-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase}</li>
                         ))}
                     </ul>
                 </ScrollArea>
             </MetricCard>
         )}
 
-        {mostUsedPhrases?.userB && mostUsedPhrases.userB.length > 0 && mostUsedPhrases.userB[0].word !== "N/A" && (
+        {mostUsedPhrases?.userB && mostUsedPhrases.userB.length > 0 && mostUsedPhrases.userB[0] !== "N/A" && (
             <MetricCard title={`Most Used Phrases (${userBLabel})`} icon={Repeat} className="bg-card">
                 <ScrollArea className="h-40">
                     <ul className="space-y-1 text-sm">
                         {mostUsedPhrases.userB.map((phrase, i) => (
-                            <li key={`ub-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase.word}</li>
+                            <li key={`ub-phrase-${i}`} className="p-1 bg-background rounded-sm text-foreground">{phrase}</li>
                         ))}
                     </ul>
                 </ScrollArea>
@@ -466,6 +466,27 @@ export function AnalysisDashboard({ analysisData, fileName, onReset }: AnalysisD
             </ScrollArea>
           </MetricCard>
         )}
+        
+        {redFlags && redFlags.length > 0 && (
+          <MetricCard title="Potential Red Flags" icon={FileWarning} className="lg:col-span-3 bg-card border-destructive/50">
+            <ScrollArea className="h-48">
+              <ul className="space-y-3">
+                {redFlags.map((flag, i) => (
+                  <li key={`red-flag-${i}`} className="p-3 bg-background rounded-md shadow-sm border border-destructive/20">
+                    <div className="flex justify-between items-start gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        From: <span className="font-semibold text-destructive">{flag.sender === 'User A' ? userALabel : flag.sender === 'User B' ? userBLabel : flag.sender}</span>
+                      </p>
+                      <Badge variant="destructive" className="text-xs shrink-0">{flag.reason}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-foreground italic">"{flag.message}"</p>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          </MetricCard>
+        )}
+
       </div>
       <AchievementsSection analysisData={analysisData} userALabel={userALabel} userBLabel={userBLabel} />
     </div>
