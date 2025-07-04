@@ -12,14 +12,25 @@ export function FrequentWordsChart({ data }: FrequentWordsChartProps) {
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme || 'dark';
 
-  // Reverse the array so the most frequent word (first in the list) appears at the top.
-  const chartData = [...(data || [])].reverse();
-
   const tickColor = currentTheme === 'dark' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground))';
 
   if (!data || data.length === 0) {
     return <div className="flex items-center justify-center h-[200px]"><p className="text-muted-foreground text-sm">No specific words found.</p></div>;
   }
+
+  // Gracefully handle old data format from localStorage
+  if (typeof data[0] === 'string' || data[0].count === undefined) {
+    return (
+        <div className="flex items-center justify-center h-[200px] p-4 text-center">
+            <p className="text-muted-foreground text-sm">
+                The data format for this chart has been updated. Please re-analyze your chat log to see word counts.
+            </p>
+        </div>
+    );
+  }
+
+  // Reverse the array so the most frequent word (first in the list) appears at the top.
+  const chartData = [...(data || [])].reverse();
 
   return (
     <ResponsiveContainer width="100%" height={200}>
