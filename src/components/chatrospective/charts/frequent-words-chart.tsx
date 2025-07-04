@@ -29,8 +29,9 @@ export function FrequentWordsChart({ data }: FrequentWordsChartProps) {
     );
   }
 
-  // The data from the service is already sorted descending.
-  const chartData = [...(data || [])];
+  // The data from the service is sorted descending. Recharts renders the first item at the bottom.
+  // To display the highest value at the top, we need to reverse the data array.
+  const chartData = [...(data || [])].reverse();
 
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -56,7 +57,6 @@ export function FrequentWordsChart({ data }: FrequentWordsChartProps) {
           axisLine={false}
           width={80}
           tick={{ dx: -5, fill: tickColor, style: { textAnchor: 'end' } }}
-          reversed={true}
         />
         <Bar dataKey="count" fill="url(#gradientWords)" radius={[0, 4, 4, 0]} barSize={20}>
           <LabelList dataKey="count" position="right" offset={5} className="fill-foreground" fontSize={12} />
