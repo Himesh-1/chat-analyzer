@@ -3,11 +3,12 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
+import type { DeterministicAnalysis } from '@/services/chat-analyzer';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
 interface MessagesSentChartProps {
-  data: CommunicationAnalysisOutput['totalMessagesSent'];
+  data: DeterministicAnalysis['totalMessagesSent'];
   userALabel: string;
   userBLabel: string;
 }

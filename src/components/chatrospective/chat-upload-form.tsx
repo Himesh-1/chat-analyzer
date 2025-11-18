@@ -8,12 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, UploadCloud, FileText, XCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-// AI-based flows
-import { chatLogParsing, type ChatLogParsingOutput } from '@/ai/flows/chat-log-parsing';
-import { communicationAnalysis, type CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
-
-// Deterministic calculation service
-import { analyzeChatMetrics, type DeterministicAnalysis } from '@/services/chat-analyzer';
+// Types only — do not import server functions on the client
+import type { ChatLogParsingOutput } from '@/ai/flows/chat-log-parsing';
+import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
+import type { DeterministicAnalysis } from '@/services/chat-analyzer';
 
 // Combined type for the final analysis result
 export type FullAnalysisOutput = DeterministicAnalysis & CommunicationAnalysisOutput;
@@ -99,23 +97,25 @@ export function ChatUploadForm({ onAnalysisComplete, isLoading, setIsLoading }: 
 
     setIsLoading(true);
     try {
-      // Step 1: Parse chat log using AI to handle messy formats
-      const parsedData = await chatLogParsing({ chatLog: fileContent });
-      if (!parsedData || !parsedData.messages) {
-        throw new Error("Failed to parse the chat log.");
+      // Send chat log to server API that runs parsing + analysis server-side
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatLog: fileContent }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Analysis failed: ${text}`);
       }
 
-      // Step 2: Perform deterministic calculations on the parsed data
-      const deterministicData = await analyzeChatMetrics(parsedData);
-      
-      // Step 3: Perform AI-based analysis for subjective metrics
-      const aiData = await communicationAnalysis({ chatLog: fileContent });
-      if (!aiData) {
-        throw new Error("Communication analysis failed to return data.");
-      }
+      const json = await res.json();
+      const parsedData: ChatLogParsingOutput = json.parsedData;
+      const fullAnalysisData: FullAnalysisOutput = json.analysis;
 
-      // Step 4: Combine deterministic and AI results
-      const fullAnalysisData: FullAnalysisOutput = { ...deterministicData, ...aiData };
+      if (!parsedData || !fullAnalysisData) {
+        throw new Error('Analysis returned incomplete data.');
+      }
 
       onAnalysisComplete(fileName, fileContent, fullAnalysisData, parsedData);
 

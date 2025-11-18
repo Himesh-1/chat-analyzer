@@ -3,11 +3,12 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import type { CommunicationAnalysisOutput } from '@/ai/flows/communication-analysis';
+import type { DeterministicAnalysis } from '@/services/chat-analyzer';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
 interface AvgResponseTimeChartProps {
-  data: CommunicationAnalysisOutput['averageResponseTime'];
+  data: DeterministicAnalysis['averageResponseTime'];
   userALabel: string;
   userBLabel: string;
 }
