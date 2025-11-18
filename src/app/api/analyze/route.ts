@@ -1,8 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-import { chatLogParsing } from '@/ai/flows/chat-log-parsing';
-import { communicationAnalysis } from '@/ai/flows/communication-analysis';
-import { analyzeChatMetrics } from '@/services/chat-analyzer';
+import { runFullAnalysis } from '@/server/analysis-service';
 
 export async function POST(request: Request) {
   try {
@@ -12,18 +10,29 @@ export async function POST(request: Request) {
       return new Response(JSON.stringify({ error: 'Missing chatLog in request body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // Run parsing flow (server-side)
-    const parsedData = await chatLogParsing({ chatLog });
+    // Default: run integrated, in-process analysis (single-server mode)
+    // If you explicitly want to forward to an external Genkit service, set
+    // the environment variable `USE_EXTERNAL_GENKIT=true` and `GENKIT_URL`.
+    const useExternal = String(process.env.USE_EXTERNAL_GENKIT || '').toLowerCase() === 'true';
+    const genkitUrl = process.env.GENKIT_URL;
+    if (useExternal && genkitUrl) {
+      try {
+        const res = await fetch(genkitUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chatLog }),
+        });
 
-    // Deterministic calculations
-    const deterministic = await analyzeChatMetrics(parsedData);
+        const text = await res.text();
+        return new Response(text, { status: res.status, headers: { 'Content-Type': res.headers.get('content-type') || 'application/json' } });
+      } catch (forwardErr: any) {
+        // If forwarding fails, log and fall back to integrated analysis
+        console.error('Forward to GENKIT_URL failed:', forwardErr);
+      }
+    }
 
-    // AI-driven communication analysis
-    const aiData = await communicationAnalysis({ chatLog });
-
-    const fullAnalysis = { ...deterministic, ...aiData };
-
-    return new Response(JSON.stringify({ parsedData, analysis: fullAnalysis }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    const result = await runFullAnalysis(chatLog);
+    return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err?.message || String(err) }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }

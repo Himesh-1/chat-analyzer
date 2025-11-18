@@ -1,0 +1,18 @@
+# Dockerfile to run the Genkit server (runs the same dev entry used locally)
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev
+
+# Copy source
+COPY . .
+
+# Expose port (Genkit default may vary; Genkit CLI typically listens on 3000)
+ENV PORT=3000
+EXPOSE 3000
+
+# Start the Genkit server using the same command from package.json
+CMD ["sh", "-c", "npx genkit start -- tsx src/ai/dev.ts --port $PORT"]

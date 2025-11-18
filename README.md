@@ -91,6 +91,30 @@ Example environment variables to set in Vercel:
 - `GOOGLE_API_KEY` — API key for Google AI/Gemini
 - `GENKIT_URL` — the public URL of your hosted Genkit server (for example `https://genkit.example.com/run`)
 
+### Single-server (integrated) deployment — preferred for simplicity
+
+This repository already supports running the Genkit flows inside the Next.js server runtime so you can deploy one service (Vercel) that both hosts the frontend and runs the analysis.
+
+How it works:
+
+- By default the API route `/api/analyze` runs the parsing flow, deterministic analysis, and AI-driven analysis in-process using the code under `src/ai/*`. That means you do NOT need to host a separate Genkit server — the Next.js server executes the flows when a user uploads a chat.
+- For users who still prefer a separate Genkit service, `/api/analyze` can be configured to forward to an external Genkit server when **both** `USE_EXTERNAL_GENKIT=true` and `GENKIT_URL` are set in the environment. Otherwise the integrated mode is used.
+
+Deployment checklist for integrated mode:
+
+1. In Vercel set the following environment variables:
+    - `GOOGLE_API_KEY` — your Google AI/Gemini API key (required by the Genkit Google plugin used by the flows).
+    - (Optional) `USE_EXTERNAL_GENKIT` and `GENKIT_URL` — only if you want to forward analysis to an externally hosted Genkit service.
+
+2. Deploy the repo root to Vercel (no special root path required).
+
+3. Vercel will build and run the Next.js app; serverless functions will execute the analysis flows when `/api/analyze` is called.
+
+Notes:
+
+- Running the flows inside Vercel serverless functions may have cold-start and execution-time constraints depending on your Vercel plan and the complexity of the flows. If you encounter timeouts or resource limits, consider hosting a persistent Genkit service (Docker) and enable `USE_EXTERNAL_GENKIT=true` with `GENKIT_URL`.
+- If you want me to instead add a lightweight wrapper service (Express) and a Dockerfile that runs the flows as a persistent HTTP service (recommended for high-throughput production), tell me and I will add it and provide deployment steps.
+
 - **Set Node version**: Ensure your Vercel project's Node.js version is compatible (Node 18+ / 20 recommended). You can set the Node version in the Vercel project settings or add an `engines` field to `package.json` if desired.
 
 - **Build & deploy**: Vercel will auto-detect this as a Next.js app. You can deploy directly from the GitHub repo. The included `vercel.json` ensures the Next.js builder is used.
